@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COBOL王への道 — 完全学習テキスト</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+:root{
+  --gold:#c9a84c;--gold-light:#f0d080;--gold-dark:#8a6a1a;
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a28;--bg4:#0e0e18;
+  --border:#2a2a40;--border2:#3a3a55;
+  --text:#e8e4d8;--text2:#9a9480;--text3:#6a6458;
+  --easy:#4caf82;--mid:#e8a030;--hard:#e84c4c;
+  --info:#4a9edd;--tip:#a855f7;
+  --mono:'Share Tech Mono',monospace;
+  --serif:'Noto Serif JP',serif;
+  --sans:'Noto Sans JP',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(201,168,76,.07) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* ── サイドバー ── */
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--bg2);border-right:.5px solid var(--border);overflow-y:auto;z-index:100;display:flex;flex-direction:column;}
+.sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:.5px solid var(--border);}
+.sidebar-logo .crown{font-size:28px;line-height:1;}
+.sidebar-logo .title{font-family:var(--serif);font-size:14px;font-weight:900;color:var(--gold);letter-spacing:.08em;margin-top:6px;line-height:1.3;}
+.sidebar-logo .sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px;letter-spacing:.1em;}
+.sidebar-progress{padding:.75rem 1.25rem;border-bottom:.5px solid var(--border);}
+.sp-label{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:6px;}
+.sp-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.sp-fill{height:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold));border-radius:2px;transition:width .5s;}
+.sp-pct{font-size:11px;color:var(--gold);font-family:var(--mono);margin-top:4px;}
+.sidebar-nav{flex:1;padding:.5rem 0;}
+.nav-chapter{padding:0;}
+.nav-ch-btn{width:100%;background:none;border:none;padding:.6rem 1.25rem;font-size:12px;color:var(--text2);font-family:var(--sans);text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s,color .15s;}
+.nav-ch-btn:hover{background:rgba(201,168,76,.06);color:var(--text);}
+.nav-ch-btn.active{color:var(--gold);background:rgba(201,168,76,.08);}
+.nav-ch-btn.done{color:var(--easy);}
+.nav-num{font-family:var(--mono);font-size:10px;min-width:20px;color:var(--text3);}
+.nav-ch-btn.active .nav-num{color:var(--gold);}
+.nav-ch-btn.done .nav-num{color:var(--easy);}
+.check-icon{margin-left:auto;font-size:12px;}
+
+/* ── メインコンテンツ ── */
+.main{margin-left:260px;min-height:100vh;position:relative;z-index:1;}
+.chapter-page{display:none;padding:3rem 3.5rem 6rem;max-width:820px;}
+.chapter-page.active{display:block;}
+
+/* ── チャプターヘッダー ── */
+.ch-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:.5px solid var(--border);}
+.ch-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.15em;margin-bottom:8px;}
+.ch-title{font-family:var(--serif);font-size:clamp(24px,3vw,36px);font-weight:900;color:var(--gold);line-height:1.3;margin-bottom:8px;text-shadow:0 0 30px rgba(201,168,76,.2);}
+.ch-desc{font-size:14px;color:var(--text2);line-height:1.8;}
+
+/* ── テキスト要素 ── */
+h2{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--text);margin:2.5rem 0 1rem;padding-left:12px;border-left:3px solid var(--gold);}
+h3{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--gold-light);margin:2rem 0 .75rem;}
+p{font-size:15px;line-height:1.9;color:var(--text);margin-bottom:1rem;}
+p+p{margin-top:.25rem;}
+strong{color:var(--gold-light);font-weight:700;}
+em{color:var(--mid);font-style:normal;font-weight:500;}
+
+/* ── コードブロック ── */
+.code{background:#060610;border:.5px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;font-family:var(--mono);font-size:13px;line-height:2;color:#b8e0b8;white-space:pre;overflow-x:auto;margin:1.25rem 0;position:relative;}
+.code-label{position:absolute;top:8px;right:12px;font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;}
+.code .kw{color:#79b8ff;}
+.code .cm{color:#5a6a5a;font-style:italic;}
+.code .num{color:#f8c555;}
+.code .str{color:#f0a0a0;}
+.code .hi{background:rgba(201,168,76,.15);border-radius:2px;padding:0 2px;}
+
+/* ── 豆知識・ヒント・警告ボックス ── */
+.box{border-radius:12px;padding:1.25rem 1.5rem;margin:1.5rem 0;font-size:14px;line-height:1.85;position:relative;padding-left:3.5rem;}
+.box::before{position:absolute;left:1.25rem;top:1.25rem;font-size:20px;}
+.box-tip{background:rgba(168,85,247,.1);border:.5px solid rgba(168,85,247,.3);color:#d4b0f8;}
+.box-tip::before{content:'💡';}
+.box-info{background:rgba(74,158,221,.1);border:.5px solid rgba(74,158,221,.3);color:#9dd0f8;}
+.box-info::before{content:'📖';}
+.box-warn{background:rgba(232,76,76,.1);border:.5px solid rgba(232,76,76,.3);color:#f0a0a0;}
+.box-warn::before{content:'⚠️';}
+.box-fun{background:rgba(232,160,48,.1);border:.5px solid rgba(232,160,48,.3);color:#f8d090;}
+.box-fun::before{content:'😄';}
+.box-king{background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.4);color:var(--gold-light);}
+.box-king::before{content:'👑';}
+.box strong{color:inherit;font-weight:700;}
+
+/* ── 比較テーブル ── */
+.tbl{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:13px;}
+.tbl th{background:var(--bg3);color:var(--gold);font-weight:700;padding:10px 14px;text-align:left;border:.5px solid var(--border);}
+.tbl td{padding:9px 14px;border:.5px solid var(--border);color:var(--text2);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.tbl code{font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:1px 6px;border-radius:4px;}
+
+/* ── ミニクイズ ── */
+.quiz-block{background:var(--bg2);border:.5px solid var(--border);border-radius:14px;padding:1.5rem;margin:2rem 0;position:relative;overflow:hidden;}
+.quiz-block::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4;}
+.quiz-label{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.15em;margin-bottom:10px;}
+.quiz-q{font-size:15px;font-weight:500;color:var(--text);margin-bottom:14px;line-height:1.7;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg3);border:.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);text-align:left;cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:border-color .15s,background .15s;font-family:var(--sans);}
+.quiz-opt:hover:not(:disabled){border-color:var(--gold);background:rgba(201,168,76,.06);}
+.quiz-opt.correct{background:rgba(76,175,130,.12);border-color:var(--easy);color:#7fe0b0;}
+.quiz-opt.wrong{background:rgba(232,76,76,.12);border-color:var(--hard);color:#f09090;}
+.quiz-lbl{font-family:var(--mono);font-size:11px;color:var(--gold);min-width:18px;}
+.quiz-exp{background:rgba(201,168,76,.06);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 14px;font-size:13px;line-height:1.8;color:var(--text2);margin-top:12px;display:none;}
+.quiz-exp.show{display:block;}
+.quiz-exp strong{color:var(--gold-light);}
+
+/* ── 章末ナビ ── */
+.ch-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);}
+.ch-nav-btn{background:transparent;border:.5px solid var(--border);border-radius:8px;padding:10px 22px;font-family:var(--mono);font-size:12px;color:var(--text2);cursor:pointer;transition:border-color .15s,color .15s;}
+.ch-nav-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+.ch-nav-btn:disabled{opacity:.25;cursor:not-allowed;}
+.ch-nav-btn.primary{border-color:var(--gold);color:var(--gold);}
+.ch-progress{font-family:var(--mono);font-size:11px;color:var(--text3);}
+
+/* ── レスポンシブ ── */
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:.5px solid var(--border);}
+  .sidebar-nav{display:flex;flex-wrap:wrap;padding:.5rem;}
+  .nav-ch-btn{width:auto;padding:.4rem .75rem;font-size:11px;}
+  .check-icon{display:none;}
+  .main{margin-left:0;}
+  .chapter-page{padding:1.5rem 1.25rem 4rem;}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease;}
+
+/* ── 目次ページ ── */
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.5rem 0;}
+.toc-card{background:var(--bg2);border:.5px solid var(--border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:border-color .2s,transform .15s;}
+.toc-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.toc-num{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;}
+.toc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.toc-sub{font-size:11px;color:var(--text3);}
+.toc-diff{display:flex;gap:4px;margin-top:8px;}
+.toc-dot{width:6px;height:6px;border-radius:50%;}
+@media(max-width:600px){.toc-grid{grid-template-columns:1fr;}}
+
+/* ── 難易度インジケーター ── */
+.diff-bar{display:flex;align-items:center;gap:8px;margin:1rem 0 1.5rem;font-size:12px;color:var(--text3);font-family:var(--mono);}
+.diff-seg{width:40px;height:4px;border-radius:2px;background:var(--border);}
+.diff-seg.on-easy{background:var(--easy);}
+.diff-seg.on-mid{background:var(--mid);}
+.diff-seg.on-hard{background:var(--hard);}
+</style>
+</head>
+<body>
+
+<!-- ── サイドバー ── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="crown">👑</div>
+    <div class="title">COBOL王への道</div>
+    <div class="sub">完全学習テキスト</div>
+  </div>
+  <div class="sidebar-progress">
+    <div class="sp-label">学習進捗</div>
+    <div class="sp-bar"><div class="sp-fill" id="sp-fill" style="width:0%"></div></div>
+    <div class="sp-pct" id="sp-pct">0 / 10 章完了</div>
+  </div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+</nav>
+
+<!-- ── メインコンテンツ ── -->
+<main class="main" id="main"></main>
+
+<script>
+const CHAPTERS = [
+  {
+    id:0, title:'はじめに——COBOLとは何者か', sub:'歴史・特徴・なぜ今学ぶのか',
+    diffs:[1,0,0],
+    content:`
+<p>COBOLを学ぼうとしているあなた、まず一言言わせてください。</p>
+<p><strong>「よく来た。君を待っていた。」</strong></p>
+<p>COBOLは1959年に生まれました。その年、日本では岸信介内閣が日米安保条約の改定に動き始め、力道山がプロレス界を席巻していた時代です。そんな時代に生まれたプログラミング言語が、2026年現在もなお世界の金融・行政・物流システムを支えているという事実は、率直に言って<em>ちょっと信じがたい</em>ですよね。</p>
+
+<div class="box box-fun">
+<strong>豆知識その1：COBOLの行数は宇宙規模</strong><br>
+世界中で稼働中のCOBOLコードは約2,000億行と言われています。これを読み上げると約6,300年かかる計算です。COBOLは「レガシー」どころか、<strong>宇宙規模の現役選手</strong>です。
+</div>
+
+<h2>COBOLとは何か</h2>
+<p>COBOL（コボル）は <strong>Common Business-Oriented Language</strong>（共通事務処理用言語）の略です。名前の通り、ビジネス・事務処理のために設計されました。</p>
+<p>当時のコンピュータは軍事・科学計算用途が主流でした。FORTRANはロケット計算には最適でしたが、「売上を集計して請求書を発行する」といった事務処理には不向きでした。そこで<strong>グレース・ホッパー提督</strong>（後述）らが中心となって設計したのがCOBOLです。</p>
+
+<div class="box box-info">
+<strong>グレース・ホッパーとは？</strong><br>
+COBOLの母とも呼ばれる米海軍提督。「バグ（bug）」という言葉を広めたのも彼女です。実際にコンピュータの中に迷い込んだ蛾（moth）を取り除いた際に「First actual case of bug being found（実際のバグが発見された最初の事例）」とノートに書き残しました。テクノロジー史上最も有名な虫です。
+</div>
+
+<h2>COBOLの3大特徴</h2>
+<table class="tbl">
+<tr><th>特徴</th><th>内容</th><th>Java/C言語との比較</th></tr>
+<tr><td><strong>英語に近い文法</strong></td><td>MOVE, COMPUTE, DISPLAY など動詞で書く</td><td><code>=</code>や<code>++</code>より読みやすい（人によっては長ったらしい）</td></tr>
+<tr><td><strong>10進数が得意</strong></td><td>COMP-3（パック10進）で金額を正確に扱える</td><td>Javaのdoubleは0.1が正確に表現できない</td></tr>
+<tr><td><strong>ファイル処理が強力</strong></td><td>順・索引・相対編成ファイルを標準サポート</td><td>Javaでは別途ライブラリが必要</td></tr>
+</table>
+
+<h2>なぜ今COBOLを学ぶのか</h2>
+<p>「古いから不要」と思いますか？実は逆です。</p>
+<p>日本の主要銀行・保険会社・行政システムのほぼすべてが、今もCOBOLで動いています。そして<strong>2035年の崖</strong>——富士通メインフレームのサポート終了が迫り、これらのシステムを刷新できるエンジニアの需要は急騰しています。</p>
+<p>COBOLを読み解ける人材は<em>希少価値が高く</em>、モダナイゼーション（近代化）プロジェクトでは引く手あまたです。</p>
+
+<div class="box box-king">
+<strong>このテキストで到達できる場所</strong><br>
+COBOL王100問チャレンジの全問正解レベルの知識を習得します。データ定義・演算・制御構造・ファイル操作・サブプログラムまで、体系的に学んでいきましょう。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">COBOLが特に得意とする数値表現方式はどれか？</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,1)"><span class="quiz-lbl">ア</span>2進浮動小数点（IEEE 754）</button>
+  <button class="quiz-opt" onclick="qpick(this,1,1)"><span class="quiz-lbl">イ</span>10進数パック（COMP-3）</button>
+  <button class="quiz-opt" onclick="qpick(this,2,1)"><span class="quiz-lbl">ウ</span>16進数固定長</button>
+  <button class="quiz-opt" onclick="qpick(this,3,1)"><span class="quiz-lbl">エ</span>文字列形式の数値のみ</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）10進数パック（COMP-3）</strong><br>
+  COBOLのCOMP-3は10進数を2桁/バイトで格納します。0.1を正確に表現できるため金融計算に最適です。JavaのdoubleはIEEE 754（2進浮動小数点）のため、0.1 + 0.2 = 0.30000000000000004 という誤差が生じます。銀行システムでこれが起きたら大変なことになりますね。
+</div>
+</div>`
+  },
+  {
+    id:1, title:'第1章　プログラム構造——4つの師団', sub:'IDENTIFICATION・ENVIRONMENT・DATA・PROCEDURE',
+    diffs:[1,0,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg"></div><div class="diff-seg"></div><span>易</span></div>
+
+<p>COBOLプログラムは必ず<strong>4つのDIVISION（師団）</strong>で構成されます。軍隊のような命名ですが、グレース・ホッパーが海軍提督だったことを考えると納得感がありますね。</p>
+
+<div class="code"><span class="code-label">COBOL基本構造</span><span class="kw">IDENTIFICATION DIVISION.</span>
+<span class="cm">* プログラムの身分証明書</span>
+PROGRAM-ID. HELLO-WORLD.
+
+<span class="kw">ENVIRONMENT DIVISION.</span>
+<span class="cm">* 動作環境の設定（ファイルなど）</span>
+
+<span class="kw">DATA DIVISION.</span>
+<span class="cm">* 変数・ファイルの定義</span>
+WORKING-STORAGE SECTION.
+01 WS-MSG PIC X(12) VALUE "HELLO WORLD".
+
+<span class="kw">PROCEDURE DIVISION.</span>
+<span class="cm">* 実際の処理</span>
+    DISPLAY WS-MSG
+    STOP RUN.</div>
+
+<h2>IDENTIFICATION DIVISION</h2>
+<p>プログラムの「名刺」です。最低限 <code>PROGRAM-ID</code> が必要です。プログラム名はハイフン区切りで最大30文字。</p>
+<div class="box box-fun">
+<strong>AUTHOR句という化石</strong><br>
+昔は AUTHOR. 中野恭秀. のように作者名を書く句がありました。COBOL 2002で廃止されましたが、古いコードには今も残っています。「化石コード」を見つけたときの、ちょっと嬉しい気持ち、わかりますか？
+</div>
+
+<h2>DATA DIVISION の構造</h2>
+<p>DATA DIVISIONには複数のSECTIONがあります。最も重要なのが <strong>WORKING-STORAGE SECTION</strong> です。</p>
+<table class="tbl">
+<tr><th>SECTION</th><th>用途</th></tr>
+<tr><td><code>FILE SECTION</code></td><td>ファイルのレコード定義</td></tr>
+<tr><td><code>WORKING-STORAGE SECTION</code></td><td>プログラム内で使う変数（Javaのフィールド変数に相当）</td></tr>
+<tr><td><code>LINKAGE SECTION</code></td><td>サブプログラムで受け取るパラメータの定義</td></tr>
+</table>
+
+<h2>PROCEDURE DIVISION——処理を書く場所</h2>
+<p>実際のロジックを書く場所です。<strong>段落（Paragraph）</strong>という単位でコードを整理します。</p>
+<div class="code"><span class="kw">PROCEDURE DIVISION.</span>
+MAIN-PROCESS.
+    PERFORM INIT-PROCESS
+    PERFORM CALC-PROCESS
+    STOP RUN.
+
+INIT-PROCESS.
+    MOVE 0 TO WS-COUNTER.
+
+CALC-PROCESS.
+    ADD 1 TO WS-COUNTER.
+    DISPLAY WS-COUNTER.</div>
+
+<div class="box box-tip">
+<strong>Javaとの対応</strong><br>
+COBOLの段落（Paragraph）はJavaのメソッドに相当します。PERFORM文でメソッド呼び出しのように使えます。ただしCOBOLの段落は引数を受け取れないため、データはすべてWORKING-STORAGEの変数で共有します。
+</div>
+
+<div class="code"><span class="code-label">Java vs COBOL 対応表イメージ</span><span class="cm">// Java</span>
+public class Hello {
+    String message = "HELLO";
+    public static void main(String[] args) {
+        System.out.println(message);
+    }
+}
+
+<span class="cm">* COBOL</span>
+<span class="kw">IDENTIFICATION DIVISION.</span>
+PROGRAM-ID. HELLO.
+<span class="kw">DATA DIVISION.</span>
+WORKING-STORAGE SECTION.
+01 WS-MSG PIC X(5) VALUE "HELLO".
+<span class="kw">PROCEDURE DIVISION.</span>
+    DISPLAY WS-MSG
+    STOP RUN.</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">COBOLプログラムで実際の処理ロジックを記述するDIVISIONはどれか？</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,3)"><span class="quiz-lbl">ア</span>IDENTIFICATION DIVISION</button>
+  <button class="quiz-opt" onclick="qpick(this,1,3)"><span class="quiz-lbl">イ</span>ENVIRONMENT DIVISION</button>
+  <button class="quiz-opt" onclick="qpick(this,2,3)"><span class="quiz-lbl">ウ</span>DATA DIVISION</button>
+  <button class="quiz-opt" onclick="qpick(this,3,3)"><span class="quiz-lbl">エ</span>PROCEDURE DIVISION</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：エ）PROCEDURE DIVISION</strong><br>
+  IDENTIFICATION DIVISIONはプログラム名の宣言、ENVIRONMENT DIVISIONは環境設定（ファイルの対応付けなど）、DATA DIVISIONは変数・ファイルの定義、PROCEDURE DIVISIONが実際のロジックを記述する場所です。
+</div>
+</div>`
+  },
+  {
+    id:2, title:'第2章　データ定義——PICの世界', sub:'PIC句・レベル番号・COMP・COMP-3・REDEFINES',
+    diffs:[1,1,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg"></div><span>易〜中</span></div>
+
+<p>COBOLのデータ定義は独特です。変数に<strong>型</strong>だけでなく<strong>桁数・小数点位置・格納形式</strong>まで細かく指定します。これがCOBOLの強みであり、最初の難所でもあります。</p>
+
+<h2>レベル番号——データの階層構造</h2>
+<p>COBOLのデータ定義は<strong>レベル番号</strong>で階層を表現します。01が最上位、02〜49が下位項目です。</p>
+<div class="code">01 WS-EMPLOYEE.           <span class="cm">← グループ項目（親）</span>
+   05 WS-EMP-ID   PIC 9(6).   <span class="cm">← 基本項目（子）</span>
+   05 WS-EMP-NAME PIC X(20).  <span class="cm">← 基本項目（子）</span>
+   05 WS-SALARY.              <span class="cm">← グループ項目（孫の親）</span>
+      10 WS-BASE  PIC 9(7).   <span class="cm">← 基本項目（孫）</span>
+      10 WS-BONUS PIC 9(6).   <span class="cm">← 基本項目（孫）</span></div>
+
+<div class="box box-tip">
+<strong>Javaとの対応</strong><br>
+COBOLのグループ項目はJavaのクラス/構造体に相当します。WS-EMPLOYEEがEmployeeクラス、WS-EMP-IDがid フィールドのイメージです。
+</div>
+
+<h2>PIC句——変数の型と桁数を同時に定義</h2>
+<table class="tbl">
+<tr><th>記号</th><th>意味</th><th>例</th><th>格納できる値</th></tr>
+<tr><td><code>9</code></td><td>数字1桁</td><td><code>PIC 9(4)</code></td><td>0000〜9999</td></tr>
+<tr><td><code>X</code></td><td>英数字1文字</td><td><code>PIC X(10)</code></td><td>任意の文字10桁</td></tr>
+<tr><td><code>A</code></td><td>英字1文字</td><td><code>PIC A(5)</code></td><td>英字のみ5桁</td></tr>
+<tr><td><code>S</code></td><td>符号付き</td><td><code>PIC S9(4)</code></td><td>-9999〜+9999</td></tr>
+<tr><td><code>V</code></td><td>仮想小数点</td><td><code>PIC 9(3)V99</code></td><td>000.00〜999.99</td></tr>
+</table>
+
+<div class="box box-warn">
+<strong>Vは「仮想」小数点——実際には格納されない！</strong><br>
+PIC 9(3)V99 に 123.45 を格納すると、内部には「12345」が格納されます。小数点の位置はプログラムが記憶しているだけです。これを忘れると「なぜか金額が100倍になる」という怪奇現象が起きます。実際の移行プロジェクトでよくある罠です。
+</div>
+
+<h2>格納形式（COMP系）</h2>
+<p>PIC句のあとに格納形式を指定することで、メモリ効率と精度を最適化できます。</p>
+<table class="tbl">
+<tr><th>形式</th><th>内部表現</th><th>バイト数（9(4)の場合）</th><th>用途</th></tr>
+<tr><td>指定なし</td><td>ゾーン10進数</td><td>4バイト（1桁1バイト）</td><td>DISPLAY・デバッグ用</td></tr>
+<tr><td><code>COMP-3</code></td><td>パック10進数</td><td>3バイト（2桁1バイト）</td><td><strong>金融計算</strong>（最重要！）</td></tr>
+<tr><td><code>COMP / BINARY</code></td><td>2進数</td><td>2バイト</td><td>インデックス・カウンタ</td></tr>
+<tr><td><code>COMP-1</code></td><td>単精度浮動小数点</td><td>4バイト</td><td>科学計算（金融では非推奨）</td></tr>
+</table>
+
+<div class="box box-king">
+<strong>COMP-3はCOBOL王試験の超頻出テーマ</strong><br>
+PIC S9(5) COMP-3 のバイト数は？→ (5+1)÷2 = 3バイト。<br>
+公式：<strong>⌈(桁数 + 1) ÷ 2⌉</strong> = バイト数<br>
++1は符号ニブル（正=C、負=D）の分です。この公式は絶対に覚えてください。
+</div>
+
+<h2>REDEFINES——同じメモリを別の顔で見る</h2>
+<div class="code">01 WS-DATE  PIC X(8).             <span class="cm">← "20240401" を格納</span>
+01 WS-DT    REDEFINES WS-DATE.
+   05 WS-YEAR  PIC X(4).          <span class="cm">← "2024"</span>
+   05 WS-MONTH PIC X(2).          <span class="cm">← "04"</span>
+   05 WS-DAY   PIC X(2).          <span class="cm">← "01"</span></div>
+<p>REDEFINESはC言語の <code>union</code> に相当します。同じメモリ領域を複数の切り口で参照できます。レコード解析・データ変換でよく使う強力な機能ですが、<em>移行時の難所</em>でもあります。</p>
+
+<div class="box box-fun">
+<strong>FILLER——名無しの変数</strong><br>
+<code>05 FILLER PIC X(2).</code> FILLERは「名前をつけない変数」です。パディング（余白）や使わない領域に使います。COBOL 2002以降は名前を省略してもFILLERと同じ扱いになりますが、古いコードにはFILLERが大量に登場します。「また君か」という感じで温かく迎えてあげてください。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">PIC S9(7) COMP-3 が占有するバイト数はいくつか？</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,4)"><span class="quiz-lbl">ア</span>3バイト</button>
+  <button class="quiz-opt" onclick="qpick(this,1,4)"><span class="quiz-lbl">イ</span>4バイト</button>
+  <button class="quiz-opt" onclick="qpick(this,2,4)"><span class="quiz-lbl">ウ</span>5バイト</button>
+  <button class="quiz-opt" onclick="qpick(this,3,4)"><span class="quiz-lbl">エ</span>7バイト</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）4バイト</strong><br>
+  公式：⌈(桁数 + 1) ÷ 2⌉ = ⌈(7 + 1) ÷ 2⌉ = ⌈4⌉ = 4バイト。<br>
+  格納イメージ（例：1234567の場合）：01 23 45 67 Cと格納されます（Cは正符号）。
+</div>
+</div>`
+  },
+  {
+    id:3, title:'第3章　演算とMOVE文', sub:'ADD・SUBTRACT・MULTIPLY・DIVIDE・COMPUTE・桁あふれ',
+    diffs:[1,1,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg"></div><span>易〜中</span></div>
+
+<h2>MOVE文——COBOLの代入</h2>
+<p>COBOLでは代入に <code>=</code> を使わず <code>MOVE</code> 文を使います。</p>
+<div class="code">MOVE 100       TO WS-NUM       <span class="cm">← 定数を変数へ</span>
+MOVE WS-A      TO WS-B         <span class="cm">← 変数を変数へ</span>
+MOVE ZEROS     TO WS-NUM       <span class="cm">← 数値をすべて0に</span>
+MOVE SPACES    TO WS-STR       <span class="cm">← 文字をすべてスペースに</span>
+MOVE "TOKYO"   TO WS-CITY      <span class="cm">← 文字列リテラル</span></div>
+
+<h3>MOVE時の桁合わせルール</h3>
+<table class="tbl">
+<tr><th>種別</th><th>桁が多い場合</th><th>桁が少ない場合</th></tr>
+<tr><td>数値項目（9）</td><td>左から切り捨て（桁あふれ！）</td><td>左ゼロ埋め（00123）</td></tr>
+<tr><td>英数字項目（X）</td><td>右から切り捨て</td><td>右スペース埋め（ABC  ）</td></tr>
+</table>
+
+<h2>算術演算文</h2>
+<div class="code"><span class="cm">* ADD：加算</span>
+ADD WS-A TO WS-B                  <span class="cm">← WS-B = WS-B + WS-A</span>
+ADD WS-A TO WS-B GIVING WS-C      <span class="cm">← WS-C = WS-A + WS-B（WS-A,Bは変わらない）</span>
+
+<span class="cm">* SUBTRACT：減算</span>
+SUBTRACT 5 FROM WS-NUM            <span class="cm">← WS-NUM = WS-NUM - 5</span>
+
+<span class="cm">* MULTIPLY：乗算</span>
+MULTIPLY WS-A BY WS-B GIVING WS-C <span class="cm">← WS-C = WS-A × WS-B</span>
+
+<span class="cm">* DIVIDE：除算</span>
+DIVIDE 10 BY 3 GIVING WS-Q
+    REMAINDER WS-R                 <span class="cm">← WS-Q=3, WS-R=1</span>
+
+<span class="cm">* COMPUTE：複合演算（最も使いやすい）</span>
+COMPUTE WS-ANS = (WS-A + WS-B) ** 2  <span class="cm">← **は累乗</span></div>
+
+<div class="box box-tip">
+<strong>実務ではCOMPUTEが主役</strong><br>
+ADD/SUBTRACT/MULTIPLYは試験によく出ますが、実務では COMPUTE を使うことが多いです。演算子の優先順位は数学と同じ（**/乗算・除算 > 加算・減算）で、括弧も使えます。
+</div>
+
+<h2>桁あふれ——COBOLの最大の罠</h2>
+<p>COBOLでは演算結果が格納先の桁数を超えても<em>デフォルトでエラーになりません</em>。上位桁が黙って切り捨てられます。</p>
+<div class="code">01 WS-A   PIC 9(2) VALUE 99.
+01 WS-B   PIC 9(2) VALUE 05.
+01 WS-ANS PIC 9(2).
+
+MULTIPLY WS-A BY WS-B GIVING WS-ANS
+<span class="cm">→ 99×5=495 → PIC 9(2)に入らないので "95" が格納される！</span>
+<span class="cm">→ エラーにはならない（これが怖い）</span></div>
+
+<div class="box box-warn">
+<strong>ON SIZE ERROR で桁あふれを検出する</strong><br>
+<code>MULTIPLY WS-A BY WS-B GIVING WS-ANS ON SIZE ERROR MOVE 0 TO WS-ANS END-MULTIPLY</code><br>
+ON SIZE ERRORを使うと桁あふれを検出できます。金融システムでは必須の安全装置です。
+</div>
+
+<div class="box box-fun">
+<strong>Y2K問題の本質はここにある</strong><br>
+西暦の下2桁だけ管理（PIC 9(2)）していたシステムで、2000年になったとき"00"を1900年と誤認しました。桁あふれ・桁不足の問題は、60年前の設計判断が現代に爆発するタイムカプセル型バグです。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">次のコードを実行後、WS-REM の値はいくつか。<br><br>
+<code style="font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:4px 8px;border-radius:4px;display:block;margin:8px 0;">DIVIDE 17 BY 5 GIVING WS-Q REMAINDER WS-REM</code></div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,2)"><span class="quiz-lbl">ア</span>1</button>
+  <button class="quiz-opt" onclick="qpick(this,1,2)"><span class="quiz-lbl">イ</span>2</button>
+  <button class="quiz-opt" onclick="qpick(this,2,2)"><span class="quiz-lbl">ウ</span>3</button>
+  <button class="quiz-opt" onclick="qpick(this,3,2)"><span class="quiz-lbl">エ</span>5</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）2</strong><br>
+  17 ÷ 5 = 商3、余り2。REMAINDER句は整数除算の余りを格納します。WS-Q=3、WS-REM=2。
+</div>
+</div>`
+  },
+  {
+    id:4, title:'第4章　条件分岐——IF と EVALUATE', sub:'IF・EVALUATE・88レベル条件名・ネスト',
+    diffs:[1,1,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg"></div><span>易〜中</span></div>
+
+<h2>IF文</h2>
+<div class="code">IF WS-SCORE >= 90
+    MOVE "A" TO WS-GRADE
+ELSE IF WS-SCORE >= 70
+    MOVE "B" TO WS-GRADE
+ELSE
+    MOVE "C" TO WS-GRADE
+END-IF</div>
+<p>COBOLのIF文はJavaとほぼ同じ構造です。<code>END-IF</code> で明示的に閉じるのが現代COBOLのスタイルです（古いコードにはEND-IFなしのものも多く、ネストが複雑になりがちです）。</p>
+
+<h2>EVALUATE文——多分岐の王様</h2>
+<p>JavaのSwitch文に相当しますが、より強力です。</p>
+<div class="code">EVALUATE TRUE
+    WHEN WS-SCORE >= 90
+        MOVE "A" TO WS-GRADE
+    WHEN WS-SCORE >= 80
+        MOVE "B" TO WS-GRADE
+    WHEN WS-SCORE >= 70
+        MOVE "C" TO WS-GRADE
+    WHEN OTHER
+        MOVE "D" TO WS-GRADE
+END-EVALUATE</div>
+
+<div class="box box-warn">
+<strong>フォールスルーは起きない</strong><br>
+Javaのswitch-caseでbreakを忘れると次のcaseに落ちますが、COBOLのEVALUATEはフォールスルーしません。最初に一致したWHENのみ実行して終了します。これはバグを防ぐ上で安全な設計です。
+</div>
+
+<h2>88レベル——条件名という魔法</h2>
+<p>COBOLには <strong>88レベル</strong> という独自機能があります。変数の値に「名前」を付けられます。</p>
+<div class="code">01 WS-STATUS  PIC X.
+   88 ORDER-NEW     VALUE "1".
+   88 ORDER-SHIPPED VALUE "2".
+   88 ORDER-DONE    VALUE "3".
+   88 ORDER-CANCEL  VALUE "9".
+
+<span class="cm">* 使い方</span>
+IF ORDER-SHIPPED
+    DISPLAY "発送済みです"
+END-IF
+
+<span class="cm">* SET文で値をセット</span>
+SET ORDER-DONE TO TRUE
+<span class="cm">→ WS-STATUSに "3" がMOVEされる</span></div>
+
+<div class="box box-tip">
+<strong>88レベルは可読性を劇的に向上させる</strong><br>
+<code>IF WS-STATUS = "2"</code> より <code>IF ORDER-SHIPPED</code> の方が圧倒的に読みやすいですよね。古いCOBOLコードの保守で「このフラグの"2"って何？」と悩む前に、88レベルを定義しましょう。
+</div>
+
+<h2>CONTINUE文——何もしない</h2>
+<div class="code">IF WS-FLG = "Y"
+    CONTINUE         <span class="cm">← 何もしない（空のブランチを明示）</span>
+ELSE
+    PERFORM ERROR-PROC
+END-IF</div>
+<p>CONTINUE は「何もしない」ことを明示する文です。NULLオペレーションとも呼ばれます。IF文の「YのときはOK、Nのときだけエラー処理」という場合に使います。</p>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">WS-SCORE = 75 のとき、次のEVALUATE文で WS-GRADE に格納される値はどれか。<br><br>
+<code style="font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:4px 8px;border-radius:4px;display:block;margin:8px 0;white-space:pre;">EVALUATE TRUE
+  WHEN WS-SCORE >= 80  MOVE "A" TO WS-GRADE
+  WHEN WS-SCORE >= 60  MOVE "B" TO WS-GRADE
+  WHEN OTHER           MOVE "C" TO WS-GRADE
+END-EVALUATE</code></div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,1)"><span class="quiz-lbl">ア</span>"A"</button>
+  <button class="quiz-opt" onclick="qpick(this,1,1)"><span class="quiz-lbl">イ</span>"B"</button>
+  <button class="quiz-opt" onclick="qpick(this,2,1)"><span class="quiz-lbl">ウ</span>"C"</button>
+  <button class="quiz-opt" onclick="qpick(this,3,1)"><span class="quiz-lbl">エ</span>エラー</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）"B"</strong><br>
+  75 >= 80は偽。75 >= 60は真 → "B"を格納して終了。EVALUATEは上から順に評価し、最初に一致したWHENのみ実行します。
+</div>
+</div>`
+  },
+  {
+    id:5, title:'第5章　繰り返し——PERFORM文', sub:'PERFORM TIMES・UNTIL・VARYING・TEST AFTER',
+    diffs:[1,1,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg"></div><span>易〜中</span></div>
+
+<h2>PERFORM の4つの形</h2>
+<div class="code"><span class="cm">① 段落呼び出し（メソッド呼び出しのように）</span>
+PERFORM CALC-PROCESS
+
+<span class="cm">② 回数指定</span>
+PERFORM 5 TIMES
+    DISPLAY "HELLO"
+END-PERFORM
+
+<span class="cm">③ 条件指定（前判定・デフォルト）</span>
+PERFORM UNTIL WS-IDX > 10
+    ADD 1 TO WS-IDX
+END-PERFORM
+
+<span class="cm">④ 後判定（最低1回は実行）</span>
+PERFORM WITH TEST AFTER UNTIL WS-FLG = "Y"
+    PERFORM READ-RECORD
+END-PERFORM</div>
+
+<div class="box box-tip">
+<strong>前判定 vs 後判定</strong><br>
+デフォルト（TEST BEFORE）は最初から条件が真なら0回実行。WITH TEST AFTERは必ず1回実行してから条件チェック。Javaの<code>while</code>と<code>do-while</code>の関係と同じです。
+</div>
+
+<h2>PERFORM VARYING——ループカウンタ付き</h2>
+<div class="code">01 WS-SUM PIC 9(5) VALUE 0.
+01 WS-I   PIC 9(2).
+
+PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > 10
+    ADD WS-I TO WS-SUM
+END-PERFORM
+<span class="cm">→ 1+2+3+...+10 = 55がWS-SUMに格納される</span></div>
+
+<h3>ネストしたPERFORM VARYING</h3>
+<div class="code">PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > 3
+    PERFORM VARYING WS-J FROM 1 BY 1 UNTIL WS-J > 3
+        DISPLAY WS-I WS-J
+    END-PERFORM
+END-PERFORM
+<span class="cm">→ 11, 12, 13, 21, 22, 23, 31, 32, 33 を表示（計9回）</span></div>
+
+<div class="box box-fun">
+<strong>PERFORM A THRU B という古い書き方</strong><br>
+<code>PERFORM INIT-PROC THRU INIT-PROC-EXIT</code> という書き方を古いコードでよく見かけます。これはINIT-PROCからINIT-PROC-EXITまでの段落を順番に実行します。現代ではあまり推奨されませんが、古いコードの解読には必須の知識です。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">次のコードを実行後、WS-RESULT の値はいくつか。<br><br>
+<code style="font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:4px 8px;border-radius:4px;display:block;margin:8px 0;white-space:pre;">01 WS-RESULT PIC 9(4) VALUE 0.
+01 WS-I      PIC 9.
+
+PERFORM VARYING WS-I FROM 1 BY 2 UNTIL WS-I > 7
+    ADD WS-I TO WS-RESULT
+END-PERFORM</code></div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,0)"><span class="quiz-lbl">ア</span>9</button>
+  <button class="quiz-opt" onclick="qpick(this,1,0)"><span class="quiz-lbl">イ</span>16</button>
+  <button class="quiz-opt" onclick="qpick(this,2,0)"><span class="quiz-lbl">ウ</span>25</button>
+  <button class="quiz-opt" onclick="qpick(this,3,0)"><span class="quiz-lbl">エ</span>28</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）16</strong><br>
+  FROM 1 BY 2なので WS-I = 1, 3, 5, 7（WS-I=9で>7なのでループ終了）。<br>
+  1 + 3 + 5 + 7 = 16。奇数の和です。
+</div>
+</div>`
+  },
+  {
+    id:6, title:'第6章　文字列操作', sub:'STRING・UNSTRING・INSPECT・部分参照',
+    diffs:[1,1,0],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg"></div><span>易〜中</span></div>
+
+<h2>部分参照——文字列の一部を取り出す</h2>
+<div class="code">01 WS-STR PIC X(10) VALUE "COBOL2024".
+
+<span class="cm">* 変数名(開始位置:長さ)</span>
+MOVE WS-STR(1:5) TO WS-OUT    <span class="cm">→ "COBOL"（1文字目から5文字）</span>
+MOVE WS-STR(6:4) TO WS-OUT    <span class="cm">→ "2024"（6文字目から4文字）</span>
+
+<span class="cm">* 書き換えも可能</span>
+MOVE "2025" TO WS-STR(6:4)    <span class="cm">→ "COBOL2025" になる</span></div>
+
+<div class="box box-warn">
+<strong>開始位置は1始まり！</strong><br>
+JavaやCでは配列が0始まりですが、COBOLの部分参照は<strong>1始まり</strong>です。これを忘れると1文字ずれたデータが取れます。試験でも実務でも要注意です。
+</div>
+
+<h2>STRING文——文字列を結合する</h2>
+<div class="code">01 WS-LAST  PIC X(4) VALUE "SATO".
+01 WS-FIRST PIC X(3) VALUE "KEN".
+01 WS-OUT   PIC X(9).
+
+STRING WS-LAST  DELIMITED BY SIZE
+       " "      DELIMITED BY SIZE
+       WS-FIRST DELIMITED BY SIZE
+       INTO WS-OUT
+<span class="cm">→ WS-OUT = "SATO KEN"</span></div>
+
+<h3>DELIMITED BY の種類</h3>
+<table class="tbl">
+<tr><th>指定</th><th>意味</th></tr>
+<tr><td><code>DELIMITED BY SIZE</code></td><td>PIC で定義した全桁数を使用</td></tr>
+<tr><td><code>DELIMITED BY SPACE</code></td><td>最初のスペースまでの文字を使用</td></tr>
+<tr><td><code>DELIMITED BY ","</code></td><td>最初の指定文字まで使用</td></tr>
+</table>
+
+<h2>UNSTRING文——文字列を分割する</h2>
+<div class="code">01 WS-IN  PIC X(15) VALUE "TOKYO,OSAKA,KOBE".
+01 WS-P1  PIC X(6).
+01 WS-P2  PIC X(6).
+01 WS-P3  PIC X(6).
+
+UNSTRING WS-IN DELIMITED BY ","
+    INTO WS-P1 WS-P2 WS-P3
+<span class="cm">→ WS-P1="TOKYO ", WS-P2="OSAKA ", WS-P3="KOBE  "</span></div>
+
+<h2>INSPECT文——検索・置換・カウント</h2>
+<div class="code">01 WS-STR PIC X(10) VALUE "AABABCABC".
+01 WS-CNT PIC 9 VALUE 0.
+
+<span class="cm">* TALLYING：カウント</span>
+INSPECT WS-STR TALLYING WS-CNT FOR ALL "A"
+<span class="cm">→ WS-CNT = 4（"A"が4個）</span>
+
+<span class="cm">* REPLACING：置換</span>
+INSPECT WS-STR REPLACING ALL "A" BY "X"
+<span class="cm">→ WS-STR = "XXBXBCXBC"</span>
+
+<span class="cm">* LEADING：先頭の連続する文字</span>
+INSPECT WS-STR REPLACING LEADING "A" BY "X"
+<span class="cm">→ WS-STR = "XABABCABC"（先頭のAのみ）</span></div>
+
+<div class="box box-fun">
+<strong>COBOLの文字列操作はなぜこんなに独特なのか</strong><br>
+COBOL設計時（1959年）、文字列を扱う処理のほとんどは「帳票の印刷」でした。だからSTRINGは「伝票を綴じる」、UNSTRINGは「伝票を切り離す」という感覚で設計されています。時代の空気を感じながら読むと、なぜこんな文法なのかが腑に落ちます。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">次のコードを実行後、WS-CNT の値はいくつか。<br><br>
+<code style="font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:4px 8px;border-radius:4px;display:block;margin:8px 0;white-space:pre;">01 WS-STR PIC X(8) VALUE "AAABBBCC".
+01 WS-CNT PIC 9 VALUE 0.
+
+INSPECT WS-STR TALLYING WS-CNT FOR LEADING "A"</code></div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,2)"><span class="quiz-lbl">ア</span>1</button>
+  <button class="quiz-opt" onclick="qpick(this,1,2)"><span class="quiz-lbl">イ</span>2</button>
+  <button class="quiz-opt" onclick="qpick(this,2,2)"><span class="quiz-lbl">ウ</span>3</button>
+  <button class="quiz-opt" onclick="qpick(this,3,2)"><span class="quiz-lbl">エ</span>4</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：ウ）3</strong><br>
+  TALLYING FOR LEADINGは先頭から連続する"A"のみをカウントします。"AAABBBCC"の先頭には"A"が3個連続しているのでWS-CNT=3。4番目は"B"なのでカウントは止まります。
+</div>
+</div>`
+  },
+  {
+    id:7, title:'第7章　配列とSEARCH', sub:'OCCURS・INDEXED BY・SEARCH・SEARCH ALL',
+    diffs:[1,1,1],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg on-hard"></div><span>易〜難</span></div>
+
+<h2>OCCURS——配列の定義</h2>
+<div class="code">01 WS-TABLE.
+   05 WS-ITEM OCCURS 5 TIMES PIC 9(3).
+
+<span class="cm">* アクセス（インデックスは1始まり）</span>
+MOVE 100 TO WS-ITEM(1)
+MOVE 200 TO WS-ITEM(2)
+DISPLAY WS-ITEM(3)</div>
+
+<h3>2次元配列</h3>
+<div class="code">01 WS-MATRIX.
+   05 WS-ROW OCCURS 3 TIMES.
+      10 WS-COL OCCURS 3 TIMES PIC 9.
+
+<span class="cm">* アクセス：WS-COL(行, 列)</span>
+MOVE 7 TO WS-COL(2, 3)    <span class="cm">← 2行3列目に7を格納</span></div>
+
+<h2>SEARCH——線形探索</h2>
+<div class="code">01 WS-TABLE.
+   05 WS-ITEM OCCURS 5 TIMES
+              INDEXED BY WS-IDX   <span class="cm">← INDEXED BYが必要</span>
+              PIC 9(2).
+
+SET WS-IDX TO 1               <span class="cm">← 必ず初期化する</span>
+SEARCH WS-ITEM
+    AT END
+        MOVE "N" TO WS-FOUND  <span class="cm">← 見つからなかった場合</span>
+    WHEN WS-ITEM(WS-IDX) = WS-KEY
+        MOVE "Y" TO WS-FOUND  <span class="cm">← 発見！</span>
+END-SEARCH</div>
+
+<div class="box box-warn">
+<strong>SEARCH後のインデックス値に注意</strong><br>
+SEARCH成功後、インデックスは<strong>発見した位置</strong>を指したままです。失敗（AT END）の場合は、OCCURSの要素数+1の値になります。この挙動を知らないと、発見後の処理でバグが起きます。
+</div>
+
+<h2>SEARCH ALL——二分探索（高速！）</h2>
+<div class="code">01 WS-TABLE.
+   05 WS-ITEM OCCURS 100 TIMES
+              ASCENDING KEY WS-ITEM  <span class="cm">← ソート順を宣言（必須）</span>
+              INDEXED BY WS-IDX
+              PIC 9(4).
+
+SEARCH ALL WS-ITEM
+    AT END MOVE "N" TO WS-FOUND
+    WHEN WS-ITEM(WS-IDX) = WS-KEY
+        MOVE "Y" TO WS-FOUND
+END-SEARCH</div>
+
+<table class="tbl">
+<tr><th></th><th>SEARCH（線形）</th><th>SEARCH ALL（二分）</th></tr>
+<tr><td>前提条件</td><td>なし</td><td>昇順または降順にソート済み</td></tr>
+<tr><td>最大比較回数（n=100）</td><td>100回</td><td>7回（⌈log₂101⌉）</td></tr>
+<tr><td>ASCENDING KEY定義</td><td>不要</td><td>必須</td></tr>
+</table>
+
+<div class="box box-king">
+<strong>COBOL王試験 頻出：SEARCH ALL の最大比較回数</strong><br>
+n要素の二分探索の最大比較回数 = ⌈log₂(n+1)⌉<br>
+n=10 → ⌈log₂(11)⌉ = ⌈3.46⌉ = 4回<br>
+n=100 → ⌈log₂(101)⌉ = ⌈6.66⌉ = 7回<br>
+線形探索と比べると圧倒的に少ない回数で見つかります。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">SEARCH ALL（二分探索）を使うために必要な前提条件はどれか。</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,1)"><span class="quiz-lbl">ア</span>配列の要素数が奇数であること</button>
+  <button class="quiz-opt" onclick="qpick(this,1,1)"><span class="quiz-lbl">イ</span>配列がキーで昇順または降順にソートされていること</button>
+  <button class="quiz-opt" onclick="qpick(this,2,1)"><span class="quiz-lbl">ウ</span>INDEXED BY句が不要であること</button>
+  <button class="quiz-opt" onclick="qpick(this,3,1)"><span class="quiz-lbl">エ</span>配列要素数が100以下であること</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）配列がキーで昇順または降順にソートされていること</strong><br>
+  二分探索はソート済み配列を前提に、中央値との比較を繰り返して対象を絞り込みます。ソートされていない配列に使うと正しい結果が得られません。また ASCENDING KEY / DESCENDING KEY の定義と INDEXED BY 句も必要です。
+</div>
+</div>`
+  },
+  {
+    id:8, title:'第8章　ファイル操作', sub:'FD定義・OPEN/CLOSE・READ/WRITE・REWRITE・ファイルステータス',
+    diffs:[1,1,1],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg on-easy"></div><div class="diff-seg on-mid"></div><div class="diff-seg on-hard"></div><span>易〜難</span></div>
+
+<p>COBOLのファイル操作は現代言語とは一線を画す強力な機能です。順編成・索引編成・相対編成の3種類のファイルを標準サポートします。</p>
+
+<h2>ファイル操作の基本構造</h2>
+<div class="code"><span class="cm">* ENVIRONMENT DIVISION でファイルを対応付け</span>
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+    SELECT SALES-FILE
+        ASSIGN TO "SALES.DAT"
+        FILE STATUS IS WS-FILE-STATUS.
+
+<span class="cm">* DATA DIVISION でレコード定義</span>
+DATA DIVISION.
+FILE SECTION.
+FD SALES-FILE.
+01 SALES-RECORD.
+   05 SR-DATE    PIC X(8).
+   05 SR-AMOUNT  PIC 9(8) COMP-3.
+
+<span class="cm">* PROCEDURE DIVISIONで処理</span>
+PROCEDURE DIVISION.
+    OPEN INPUT SALES-FILE
+    PERFORM UNTIL WS-FILE-STATUS = "10"
+        READ SALES-FILE
+            AT END MOVE "10" TO WS-FILE-STATUS
+            NOT AT END PERFORM PROCESS-RECORD
+        END-READ
+    END-PERFORM
+    CLOSE SALES-FILE</div>
+
+<h2>OPEN モード</h2>
+<table class="tbl">
+<tr><th>モード</th><th>できること</th></tr>
+<tr><td><code>OPEN INPUT</code></td><td>読み取り専用</td></tr>
+<tr><td><code>OPEN OUTPUT</code></td><td>書き込み専用（既存データ消去）</td></tr>
+<tr><td><code>OPEN I-O</code></td><td>読み書き両方（REWRITEが使える）</td></tr>
+<tr><td><code>OPEN EXTEND</code></td><td>末尾に追記</td></tr>
+</table>
+
+<h2>ファイルステータスコード</h2>
+<table class="tbl">
+<tr><th>コード</th><th>意味</th></tr>
+<tr><td><code>"00"</code></td><td>正常終了</td></tr>
+<tr><td><code>"10"</code></td><td>ファイル終端（AT ENDと同じ）</td></tr>
+<tr><td><code>"23"</code></td><td>レコードが見つからない（キー不一致）</td></tr>
+<tr><td><code>"35"</code></td><td>ファイルが存在しない（OPEN時）</td></tr>
+<tr><td><code>"22"</code></td><td>重複キー（WRITE時）</td></tr>
+</table>
+
+<div class="box box-warn">
+<strong>CLOSEを忘れるな</strong><br>
+CLOSE文を実行せずにプログラムを終了すると、書き込みバッファが未フラッシュのままになりデータが失われる可能性があります。また索引ファイルのポインタが不整合になりファイルが壊れることも。OPEN したら必ず CLOSE、これは鉄則です。
+</div>
+
+<div class="box box-fun">
+<strong>REWRITEはOPEN I-Oだけ</strong><br>
+REWRITE（既存レコードの上書き）はOPEN I-Oで開いたファイルにしか使えません。「I-O = 入力も出力も」と覚えると忘れません。OPEN INPUTでREWRITEしようとするのは「読み取り専用のファイルを書き換えようとする」ようなものです。
+</div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">REWRITE文を使うために必要なOPENモードはどれか。</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,2)"><span class="quiz-lbl">ア</span>OPEN INPUT</button>
+  <button class="quiz-opt" onclick="qpick(this,1,2)"><span class="quiz-lbl">イ</span>OPEN OUTPUT</button>
+  <button class="quiz-opt" onclick="qpick(this,2,2)"><span class="quiz-lbl">ウ</span>OPEN I-O</button>
+  <button class="quiz-opt" onclick="qpick(this,3,2)"><span class="quiz-lbl">エ</span>OPEN EXTEND</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：ウ）OPEN I-O</strong><br>
+  REWRITEは既存レコードの更新です。読み書き両方が必要なためOPEN I-Oが必要です。OPEN INPUTは読み取り専用なのでREWRITEは使えません。
+</div>
+</div>`
+  },
+  {
+    id:9, title:'第9章　サブプログラムと上級機能', sub:'CALL・BY REFERENCE/CONTENT・GOBACK・SORT・COMP-3精度問題',
+    diffs:[0,1,1],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg"></div><div class="diff-seg on-mid"></div><div class="diff-seg on-hard"></div><span>中〜難</span></div>
+
+<h2>CALL文——サブプログラムの呼び出し</h2>
+<div class="code"><span class="cm">* 呼び出し側（主プログラム）</span>
+01 WS-NUM PIC 9(3) VALUE 100.
+
+CALL "SUBPGM" USING BY REFERENCE WS-NUM
+<span class="cm">→ BY REFERENCE: アドレスを渡す（変更が呼び出し元に反映される）</span>
+
+CALL "SUBPGM" USING BY CONTENT WS-NUM
+<span class="cm">→ BY CONTENT: コピーを渡す（変更は反映されない）</span></div>
+
+<div class="code"><span class="cm">* 呼ばれる側（サブプログラム）</span>
+IDENTIFICATION DIVISION.
+PROGRAM-ID. SUBPGM.
+DATA DIVISION.
+LINKAGE SECTION.
+01 LS-PARAM PIC 9(3).        <span class="cm">← LINKAGE SECTIONで受け取る</span>
+
+PROCEDURE DIVISION USING LS-PARAM.
+    ADD 1 TO LS-PARAM
+    GOBACK.                  <span class="cm">← 呼び出し元に戻る</span></div>
+
+<table class="tbl">
+<tr><th></th><th>BY REFERENCE</th><th>BY CONTENT</th></tr>
+<tr><td>渡すもの</td><td>変数のアドレス</td><td>変数のコピー</td></tr>
+<tr><td>変更の反映</td><td>呼び出し元に反映される</td><td>反映されない</td></tr>
+<tr><td>Javaとの対比</td><td>参照渡し（オブジェクト）</td><td>値渡し（プリミティブ）</td></tr>
+</table>
+
+<h2>GOBACK vs EXIT PROGRAM vs STOP RUN</h2>
+<table class="tbl">
+<tr><th>文</th><th>主プログラムで使用</th><th>サブプログラムで使用</th></tr>
+<tr><td><code>STOP RUN</code></td><td>プログラム終了</td><td>主プログラムも含めて終了</td></tr>
+<tr><td><code>EXIT PROGRAM</code></td><td>STOP RUN と同じ</td><td>呼び出し元に返る</td></tr>
+<tr><td><code>GOBACK</code></td><td>STOP RUN と同じ</td><td>呼び出し元に返る</td></tr>
+</table>
+
+<div class="box box-tip">
+<strong>GOBACKが最も安全</strong><br>
+GOBACKは主プログラムでもサブプログラムでも適切に動作します。移行プロジェクトではサブプログラムを主プログラムとして単体テストすることがあるため、GOBACKを使っておくと切り替えが楽です。
+</div>
+
+<h2>COMP-3 vs Java double——精度問題の深層</h2>
+<div class="code"><span class="cm">* COBOLのCOMP-3</span>
+01 WS-A PIC 9(3)V99 COMP-3 VALUE 0.10.
+01 WS-B PIC 9(3)V99 COMP-3 VALUE 0.20.
+01 WS-C PIC 9(3)V99 COMP-3.
+COMPUTE WS-C = WS-A + WS-B
+<span class="cm">→ 正確に 0.30 が格納される</span>
+
+<span class="cm">// Javaのdouble</span>
+double a = 0.1;
+double b = 0.2;
+double c = a + b;
+<span class="cm">// c = 0.30000000000000004（誤差あり！）</span></div>
+
+<div class="box box-king">
+<strong>これが金融システムでCOBOLが生き残る最大の理由</strong><br>
+銀行の勘定系システムで0.1円の誤差が1億件の取引で累積したら…。COMP-3の10進精度はJavaのBigDecimalに相当しますが、COBOLでは言語レベルで組み込まれています。移行時にJavaのdoubleで代替するのは<em>絶対NG</em>です。
+</div>
+
+<h2>SORT文</h2>
+<div class="code">FILE SECTION.
+SD SORT-FILE.                     <span class="cm">← SDで定義（FDではない！）</span>
+01 SORT-RECORD PIC X(80).
+
+PROCEDURE DIVISION.
+    SORT SORT-FILE
+        ON ASCENDING KEY SR-KEY   <span class="cm">← ソートキー</span>
+        USING  INPUT-FILE         <span class="cm">← 入力ファイル</span>
+        GIVING OUTPUT-FILE.       <span class="cm">← 出力ファイル</span></div>
+
+<div class="quiz-block">
+<div class="quiz-label">■ CHECK YOUR UNDERSTANDING</div>
+<div class="quiz-q">BY CONTENTでサブプログラムにデータを渡したとき、サブプログラムが値を変更した場合、呼び出し元の変数はどうなるか。</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,1)"><span class="quiz-lbl">ア</span>変更が反映される</button>
+  <button class="quiz-opt" onclick="qpick(this,1,1)"><span class="quiz-lbl">イ</span>変更は反映されない</button>
+  <button class="quiz-opt" onclick="qpick(this,2,1)"><span class="quiz-lbl">ウ</span>実行時エラーになる</button>
+  <button class="quiz-opt" onclick="qpick(this,3,1)"><span class="quiz-lbl">エ</span>コンパイルエラーになる</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：イ）変更は反映されない</strong><br>
+  BY CONTENTはデータのコピーを渡します。サブプログラムはコピーを操作するため、呼び出し元の変数には影響しません。変更を反映させたい場合はBY REFERENCEを使います。
+</div>
+</div>`
+  },
+  {
+    id:10, title:'第10章　COBOL王への最終チェック', sub:'総復習・試験対策・全問正解への道',
+    diffs:[0,1,1],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg"></div><div class="diff-seg on-mid"></div><div class="diff-seg on-hard"></div><span>中〜難</span></div>
+
+<p>ここまで読んできた皆さん、本当にお疲れ様でした。最後の章は<strong>総復習と試験攻略法</strong>です。</p>
+
+<h2>COBOL王100問チャレンジ 出題カテゴリ別 攻略ポイント</h2>
+
+<h3>🟢 易問（33問）で落とさないこと</h3>
+<table class="tbl">
+<tr><th>カテゴリ</th><th>絶対覚えること</th></tr>
+<tr><td>データ定義</td><td>PIC 9(n)の最大値、X=左寄り、9=右寄り</td></tr>
+<tr><td>MOVE文</td><td>ZEROS/SPACES/HIGH-VALUES のフィギュアリテラル</td></tr>
+<tr><td>PERFORM</td><td>UNTIL は前判定（0回あり得る）</td></tr>
+<tr><td>演算</td><td>GIVING句ありなしで結果変数が変わる</td></tr>
+<tr><td>ファイル操作</td><td>AT END は順編成、INVALID KEY は索引編成</td></tr>
+</table>
+
+<h3>🟡 中問（34問）で差をつけること</h3>
+<table class="tbl">
+<tr><th>カテゴリ</th><th>ポイント</th></tr>
+<tr><td>桁あふれ</td><td>エラーにならず上位桁が切り捨てられる</td></tr>
+<tr><td>EVALUATE</td><td>フォールスルーなし、WHEN OTHERがElse</td></tr>
+<tr><td>SEARCH</td><td>発見後もインデックスは発見位置を指す</td></tr>
+<tr><td>部分参照</td><td>開始位置は1始まり</td></tr>
+<tr><td>COMP-3バイト数</td><td>⌈(桁数+1)÷2⌉ を暗算できること</td></tr>
+</table>
+
+<h3>🔴 難問（33問）で王を目指す</h3>
+<table class="tbl">
+<tr><th>カテゴリ</th><th>ポイント</th></tr>
+<tr><td>BY REFERENCE vs CONTENT</td><td>参照渡しvs値渡し</td></tr>
+<tr><td>COMP-3 vs double</td><td>10進精度が金融では必須</td></tr>
+<tr><td>GOBACK</td><td>主・サブ両方で使える汎用終了文</td></tr>
+<tr><td>ファイルステータス</td><td>"23"=キー不一致、"35"=ファイル不存在</td></tr>
+<tr><td>SEARCH ALL</td><td>ソート必須、最大比較回数 = ⌈log₂(n+1)⌉</td></tr>
+</table>
+
+<h2>最後の仕上げクイズ——難問レベル</h2>
+
+<div class="quiz-block">
+<div class="quiz-label">■ FINAL CHALLENGE</div>
+<div class="quiz-q">次のコードを実行後、WS-RESULT の値はいくつか。<br><br>
+<code style="font-family:var(--mono);font-size:12px;color:#b8e0b8;background:var(--bg4);padding:4px 8px;border-radius:4px;display:block;margin:8px 0;white-space:pre;">01 WS-RESULT PIC 9(5) VALUE 0.
+01 WS-I PIC 9(2).
+01 WS-J PIC 9(2).
+
+PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > 4
+    PERFORM VARYING WS-J FROM 1 BY 1 UNTIL WS-J > WS-I
+        ADD 1 TO WS-RESULT
+    END-PERFORM
+END-PERFORM</code></div>
+<div class="quiz-opts">
+  <button class="quiz-opt" onclick="qpick(this,0,2)"><span class="quiz-lbl">ア</span>4</button>
+  <button class="quiz-opt" onclick="qpick(this,1,2)"><span class="quiz-lbl">イ</span>8</button>
+  <button class="quiz-opt" onclick="qpick(this,2,2)"><span class="quiz-lbl">ウ</span>10</button>
+  <button class="quiz-opt" onclick="qpick(this,3,2)"><span class="quiz-lbl">エ</span>16</button>
+</div>
+<div class="quiz-exp">
+  <strong>正解：ウ）10</strong><br>
+  I=1のとき内側ループはJ=1の1回。I=2のときJ=1,2の2回。I=3のときJ=1,2,3の3回。I=4のときJ=1,2,3,4の4回。<br>
+  合計 = 1+2+3+4 = <strong>10回</strong>。三角数の公式 n(n+1)/2 = 4×5/2 = 10。
+</div>
+</div>
+
+<div class="box box-king">
+<strong>👑 あなたはCOBOL王への準備ができています</strong><br>
+10章すべてを学び、各章のクイズをクリアしたあなたは、COBOL王100問チャレンジに挑む準備が整っています。<br><br>
+COBOLは「古い言語」ではなく、<strong>60年以上の実績を持つ精密な道具</strong>です。日本のITインフラを支えるこの言語を理解できるエンジニアは、これからの時代に貴重な存在になります。<br><br>
+さあ、COBOL王の称号を掴みに行きましょう！
+</div>
+
+<div style="text-align:center;margin:3rem 0 1rem;">
+  <div style="font-size:48px;margin-bottom:12px;">👑</div>
+  <div style="font-size:22px;font-family:var(--serif);font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.4);">COBOL王100問チャレンジへ</div>
+  <p style="color:var(--text2);font-size:14px;margin-top:8px;">全問正解で称号カードを獲得せよ</p>
+  <button onclick="alert('GitHub PagesのURLをここに設定してください')" style="margin-top:1rem;background:var(--gold);color:#0a0a0f;border:none;border-radius:10px;padding:14px 36px;font-family:var(--serif);font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.08em;">チャレンジへ進む →</button>
+</div>`
+  },
+  {
+    id:11, title:'付録　現実のレガシーCOBOLの「汚いコード」図鑑', sub:'実務で遭遇するありがちで厄介なコーディングパターン',
+    diffs:[0,1,1],
+    content:`
+<div class="diff-bar"><span>難易度：</span><div class="diff-seg"></div><div class="diff-seg on-mid"></div><div class="diff-seg on-hard"></div><span>中〜難（実務レベル）</span></div>
+
+<p>おめでとうございます。10章を学び終えたあなたは「教科書のCOBOL」を習得しました。しかし現実の基幹システムには、教科書には載っていない<em>手強い</em>コードが待ち受けています。</p>
+<p>この付録は、モダナイゼーション現場で実際に遭遇する「汚いコーディングパターン」の図鑑です。「こんな書き方があるのか……」という驚きとともに、なぜ問題なのかを深く理解してください。</p>
+
+<div class="box box-fun">
+<strong>免責事項（笑）</strong><br>
+以下に示すコードはすべて<strong>アンチパターン</strong>です。現役エンジニアがこれらを書くことは推奨しません。しかし、これらを<em>読めなければ</em>レガシー移行プロジェクトでは生き残れません。「敵を知り己を知れば百戦殆からず」——孫子もきっとそう言うでしょう。
+</div>
+
+<h2>【汚いコード #1】演算誤差——浮動小数点の罠</h2>
+
+<div class="box box-warn">
+<strong>問題：COMP-1/COMP-2（浮動小数点）を金融計算に使ってしまう</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例</span><span class="cm">* 金利計算に浮動小数点（COMP-1）を使用</span>
+01 WS-PRINCIPAL   PIC 9(10)V99 COMP-1.  <span class="cm">← 単精度浮動小数点！</span>
+01 WS-RATE        PIC 9(2)V9(6) COMP-1.
+01 WS-INTEREST    PIC 9(10)V99 COMP-1.
+
+MOVE 1000000.00 TO WS-PRINCIPAL
+MOVE 0.035000  TO WS-RATE
+COMPUTE WS-INTEREST = WS-PRINCIPAL * WS-RATE
+<span class="cm">* 期待値: 35000.00</span>
+<span class="cm">* 実際:   34999.996... または 35000.004... （誤差発生）</span>
+DISPLAY WS-INTEREST
+<span class="cm">* 帳票に "34999.99" と印字されてクレームが来る</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例</span>01 WS-PRINCIPAL   PIC 9(10)V99 COMP-3.  <span class="cm">← パック10進数！</span>
+01 WS-RATE        PIC 9(2)V9(6) COMP-3.
+01 WS-INTEREST    PIC 9(10)V99 COMP-3.
+
+COMPUTE WS-INTEREST = WS-PRINCIPAL * WS-RATE
+<span class="cm">* 正確に 35000.00 が得られる</span></div>
+
+<p><strong>なぜ起きるか：</strong>COMP-1（IEEE 754単精度、4バイト）は2進浮動小数点のため、0.035のような小数を正確に表現できません。銀行システムで1円単位の誤差が億件の取引に積み重なると、数百万円の損失につながります。<em>金融計算には必ずCOMP-3を使う</em>——これは鉄則です。</p>
+
+<div class="box box-fun">
+<strong>豆知識：丸め誤差の歴史的事件</strong><br>
+1982年、バンクーバー証券取引所の指数計算に浮動小数点の切り捨て誤差が使われていました。1975年に1000.000でスタートした指数が、毎回の切り捨てが積み重なり、1983年には524.811まで落ちていた……実は経済は好調だったのに。COBOLの誤差問題は笑えない話なのです。
+</div>
+
+<h2>【汚いコード #2】数値属性への文字代入——時限爆弾</h2>
+
+<div class="box box-warn">
+<strong>問題：数値項目（PIC 9）に文字や空白をMOVEしてしまう</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例</span>01 WS-AMOUNT   PIC 9(8)V99 COMP-3.
+01 WS-CODE     PIC X(10).
+01 WS-FLAG     PIC 9(1).
+
+<span class="cm">* パターン①：初期化漏れ→ゴミ値で演算</span>
+<span class="cm">* WS-AMOUNT を初期化せずに加算</span>
+ADD WS-NEW-AMT TO WS-AMOUNT   <span class="cm">← WS-AMOUNTに不定値が入っていると大惨事</span>
+
+<span class="cm">* パターン②：スペースを数値項目に代入</span>
+MOVE SPACES TO WS-FLAG        <span class="cm">← PIC 9(1)にスペース！</span>
+IF WS-FLAG = 0                <span class="cm">← 比較結果が不定（処理系依存）</span>
+    PERFORM NORMAL-PROC
+
+<span class="cm">* パターン③：文字変数から無検証でMOVE</span>
+MOVE WS-CODE(1:8) TO WS-AMOUNT  <span class="cm">← "ABCD1234" が入っていたら？</span>
+COMPUTE WS-TAX = WS-AMOUNT * 0.1  <span class="cm">← 演算結果が完全に壊れる</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例</span><span class="cm">* 必ずVALUEで初期化</span>
+01 WS-AMOUNT   PIC 9(8)V99 COMP-3 VALUE ZERO.
+01 WS-FLAG     PIC 9(1)    VALUE ZERO.
+
+<span class="cm">* 文字→数値変換は検証してから</span>
+IF WS-CODE IS NUMERIC
+    MOVE WS-CODE TO WS-AMOUNT
+ELSE
+    PERFORM ERROR-HANDLER
+END-IF</div>
+
+<p><strong>なぜ起きるか：</strong>古いCOBOLではWORKING-STORAGEの初期値が「不定」（処理系依存）でした。前回の実行で残ったゴミ値で演算が走り、帳票に「¥-999,999,999」が印字される——実際にあった話です。<code>IS NUMERIC</code>条件はこのような問題を防ぐ重要な検証手段です。</p>
+
+<h2>【汚いコード #3】部分参照の魔窟——桁数拡張の悪夢</h2>
+
+<div class="box box-warn">
+<strong>問題：部分参照を多用した仕様で、桁数変更が波及して修正地獄になる</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例（30年前の設計）</span><span class="cm">* 一つのレコードに何でも詰め込んだ「神レコード」</span>
+01 WS-MASTER-REC  PIC X(200).
+
+<span class="cm">* アクセスはすべて部分参照——仕様書がなければ意味不明</span>
+MOVE WS-MASTER-REC(1:8)   TO WS-DATE      <span class="cm">← 日付？何の日付？</span>
+MOVE WS-MASTER-REC(9:10)  TO WS-CODE      <span class="cm">← コード？種別？</span>
+MOVE WS-MASTER-REC(19:15) TO WS-NAME      <span class="cm">← 名前（全角混在！）</span>
+MOVE WS-MASTER-REC(34:12) TO WS-AMOUNT    <span class="cm">← 金額</span>
+MOVE WS-MASTER-REC(46:1)  TO WS-STATUS    <span class="cm">← ステータス</span>
+<span class="cm">* ...以降、200バイトまで続く...</span>
+
+<span class="cm">* 数年後、WS-CODEを10桁→12桁に拡張したい</span>
+<span class="cm">* → (19:15)以降のすべての開始位置を+2ずらす修正が必要</span>
+<span class="cm">* → 同じ部分参照が散在するプログラムが300本あった……</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例（レベル構造で定義）</span>01 WS-MASTER-REC.
+   05 WS-DATE     PIC X(8).
+   05 WS-CODE     PIC X(10).   <span class="cm">← 12桁に変えるときはここだけ修正</span>
+   05 WS-NAME     PIC N(7).    <span class="cm">← 全角7文字（PIC N）</span>
+   05 WS-AMOUNT   PIC 9(12) COMP-3.
+   05 WS-STATUS   PIC X(1).
+   05 FILLER      PIC X(残り).</div>
+
+<p><strong>なぜ起きるか：</strong>ディスク容量が貴重だった時代、すべてをフラットな文字列で管理するのは合理的でした。しかし仕様変更のたびに「開始位置の大移動」が発生し、修正漏れがバグを生む。部分参照の多用は「技術的負債」の塊です。</p>
+
+<div class="box box-fun">
+<strong>マジックナンバー問題</strong><br>
+<code>WS-REC(47:3)</code> というコードを見て「47バイト目から3バイト」が何を意味するか、仕様書なしでわかりますか？レガシーシステムにはこういう「マジックナンバー」が数千個あります。解読に費やした人月は数え切れません。
+</div>
+
+<h2>【汚いコード #4】REDEFINESの迷宮——レコード仕様の霧</h2>
+
+<div class="box box-warn">
+<strong>問題：REDEFINESを重ねすぎて、同じメモリが何に見えるのかわからなくなる</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例</span>01 WS-DATA          PIC X(50).
+
+<span class="cm">* 取引種別によってレコード構造が全然違う</span>
+01 WS-TYPE-A        REDEFINES WS-DATA.
+   05 WS-A-CODE     PIC X(4).
+   05 WS-A-DATE     PIC 9(8).
+   05 WS-A-AMOUNT   PIC 9(10)V99 COMP-3.
+   05 WS-A-BRANCH   PIC X(6).
+   05 FILLER        PIC X(16).
+
+01 WS-TYPE-B        REDEFINES WS-DATA.
+   05 WS-B-CODE     PIC X(4).
+   05 WS-B-NAME     PIC X(20).
+   05 WS-B-TEL      PIC X(11).
+   05 WS-B-FLAG     PIC X(1).
+   05 FILLER        PIC X(14).
+
+01 WS-TYPE-C        REDEFINES WS-DATA.
+   05 WS-C-CODE     PIC X(4).
+   05 WS-C-DETAIL   PIC X(46).  <span class="cm">← 詳細不明のごった煮領域</span>
+
+<span class="cm">* どの構造で読めばいいか？コード見ただけではわからない</span>
+EVALUATE WS-DATA(1:2)           <span class="cm">← 先頭2バイトで判定（これも部分参照）</span>
+    WHEN "10" PERFORM PROC-A
+    WHEN "20" PERFORM PROC-B
+    WHEN "30" PERFORM PROC-C
+    WHEN OTHER PERFORM ERROR-PROC <span class="cm">← WHATがどの構造か？要仕様書</span>
+END-EVALUATE</div>
+
+<div class="code"><span class="code-label">✅ 改善案（88レベルで種別を明示）</span>01 WS-TRAN-TYPE    PIC X(2).
+   88 TYPE-DEPOSIT  VALUE "10".
+   88 TYPE-WITHDRAW VALUE "20".
+   88 TYPE-TRANSFER VALUE "30".
+
+01 WS-TRAN-BODY    PIC X(48).
+01 WS-DEP-BODY     REDEFINES WS-TRAN-BODY.
+   <span class="cm">* 入金用フィールド定義...</span>
+01 WS-WDR-BODY     REDEFINES WS-TRAN-BODY.
+   <span class="cm">* 出金用フィールド定義...</span>
+
+EVALUATE TRUE
+    WHEN TYPE-DEPOSIT  PERFORM PROC-DEPOSIT
+    WHEN TYPE-WITHDRAW PERFORM PROC-WITHDRAW
+    WHEN TYPE-TRANSFER PERFORM PROC-TRANSFER
+END-EVALUATE</div>
+
+<p><strong>なぜ問題か：</strong>REDEFINESは強力ですが、重ねると「このデータは今どの形で見るべきか」が追えなくなります。特に、どの型で解釈するかの判定ロジックがプログラムに分散しているとき、仕様変更で修正箇所を特定するのが悪夢になります。</p>
+
+<h2>【汚いコード #5】10進カウンタの処理性能劣化</h2>
+
+<div class="box box-warn">
+<strong>問題：ループカウンタ・インデックスに PIC 9（ゾーン10進）を使ってしまう</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例</span><span class="cm">* ループカウンタをゾーン10進で定義</span>
+01 WS-IDX    PIC 9(6) VALUE 0.       <span class="cm">← 1バイト1桁で6バイト消費</span>
+01 WS-TOTAL  PIC 9(10) VALUE 0.
+
+PERFORM VARYING WS-IDX FROM 1 BY 1 UNTIL WS-IDX > 1000000
+    ADD WS-TABLE(WS-IDX) TO WS-TOTAL
+END-PERFORM
+<span class="cm">* 100万回ループのたびにゾーン10進の加算が走る</span>
+<span class="cm">* CPU内部では10進→2進→演算→2進→10進 の変換が毎回発生</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例</span><span class="cm">* インデックスはCOMPで定義</span>
+01 WS-IDX    PIC 9(6) COMP VALUE 0.  <span class="cm">← 2進数、4バイト、演算高速</span>
+01 WS-TOTAL  PIC 9(10) COMP-3 VALUE 0.
+
+<span class="cm">* さらに配列にINDEXED BYを使うのがベスト</span>
+05 WS-ITEM OCCURS 1000000 TIMES
+           INDEXED BY WS-IDX
+           PIC 9(8) COMP-3.
+
+SET WS-IDX TO 1
+PERFORM UNTIL WS-IDX > 1000000
+    ADD WS-ITEM(WS-IDX) TO WS-TOTAL
+    SET WS-IDX UP BY 1
+END-PERFORM</div>
+
+<p><strong>なぜ遅いか：</strong>ゾーン10進数（PIC 9）は人間が読みやすい形式ですが、CPUは2進数で計算します。毎回の変換コストが、100万回ループでは無視できない差になります。実測で2〜5倍の速度差が出るケースもあります。バッチ処理の「なぜか毎夜遅延する」問題の原因としてよく見つかります。</p>
+
+<div class="box box-info">
+<strong>INDEXED BY との使い分け</strong><br>
+配列アクセスには <code>INDEXED BY</code> を使うのが最速です。IndexはCOBOL処理系が最適な内部形式（通常COMP）で管理します。一方、ループ制御と配列インデックスを別々の変数で持ちたい場合はCOMPの変数を使いましょう。
+</div>
+
+<h2>【汚いコード #6】GOTO地獄——スパゲッティコードの完成形</h2>
+
+<div class="box box-warn">
+<strong>問題：GOTOが縦横無尽に飛び回り、処理の流れが追えなくなる</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例（実際に見つかったレベルのコード）</span>MAIN-PROC.
+    MOVE "A" TO WS-TYPE
+    GO TO CHECK-TYPE.
+
+CHECK-TYPE.
+    IF WS-TYPE = "A" GO TO PROC-A.
+    IF WS-TYPE = "B" GO TO PROC-B.
+    IF WS-TYPE = "C" GO TO PROC-C.
+    GO TO ERROR-PROC.
+
+PROC-A.
+    PERFORM CALC-A
+    IF WS-RESULT > 1000
+        GO TO OVER-LIMIT        <span class="cm">← 別の段落に飛ぶ</span>
+    GO TO OUTPUT-PROC.          <span class="cm">← また飛ぶ</span>
+
+PROC-B.
+    PERFORM CALC-B
+    IF WS-ERROR-FLG = "Y"
+        GO TO ERROR-PROC        <span class="cm">← エラー処理へ</span>
+    MOVE WS-RESULT TO WS-OUT
+    GO TO OUTPUT-PROC.
+
+PROC-C.
+    PERFORM CALC-C
+    GO TO CHECK-TYPE.           <span class="cm">← なんと先頭に戻る！</span>
+
+OVER-LIMIT.
+    MOVE 1000 TO WS-RESULT
+    GO TO OUTPUT-PROC.          <span class="cm">← また飛ぶ</span>
+
+OUTPUT-PROC.
+    WRITE OUTPUT-REC FROM WS-OUT
+    GO TO MAIN-PROC.            <span class="cm">← 最初に戻る（ループ！）</span>
+
+ERROR-PROC.
+    DISPLAY "ERROR"
+    GO TO MAIN-PROC.            <span class="cm">← エラーでも戻る…</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例（構造化プログラミング）</span>MAIN-PROC.
+    PERFORM UNTIL WS-EOF = "Y"
+        READ INPUT-FILE
+            AT END MOVE "Y" TO WS-EOF
+            NOT AT END PERFORM PROCESS-RECORD
+        END-READ
+    END-PERFORM
+    STOP RUN.
+
+PROCESS-RECORD.
+    EVALUATE WS-TYPE
+        WHEN "A" PERFORM PROC-A
+        WHEN "B" PERFORM PROC-B
+        WHEN "C" PERFORM PROC-C
+        WHEN OTHER PERFORM ERROR-PROC
+    END-EVALUATE
+    IF WS-ERROR-FLG NOT = "Y"
+        PERFORM OUTPUT-PROC
+    END-IF.
+
+PROC-A.
+    PERFORM CALC-A
+    IF WS-RESULT > 1000
+        MOVE 1000 TO WS-RESULT  <span class="cm">← インラインで処理</span>
+    END-IF.</div>
+
+<p><strong>なぜ問題か：</strong>GOTOは1968年にダイクストラが「有害なもの」と論文で指摘しました。しかしCOBOLには長年GOTOが便利に使われてきた歴史があります。GOTOが20本以上絡み合うと「スパゲッティコード」の完成です。どこから入ってどこで終わるか追跡するだけで数時間——これが移行プロジェクトで最も消耗する作業です。</p>
+
+<div class="box box-fun">
+<strong>「ALTER GO TO」という究極の悪</strong><br>
+COBOLには <code>ALTER paragraph-1 TO PROCEED TO paragraph-2</code> という文があります。これは<strong>実行時にGOTOの飛び先を書き換える</strong>という機能です。デバッガで追っていると突然違う場所に飛ぶ……。COBOL 2002で廃止されましたが、古いコードに残っていることがあります。発見したら全力で現代の構造に書き直してください。
+</div>
+
+<h2>【汚いコード #7】シングルバイト・ダブルバイト混在地獄</h2>
+
+<div class="box box-warn">
+<strong>問題：半角・全角が混在するフィールドで、文字数・バイト数・桁数がすべて異なる</strong>
+</div>
+
+<div class="code"><span class="code-label">❌ 悪い例</span><span class="cm">* PIC X(20) に全角文字を格納（EBCDICダブルバイト混在）</span>
+01 WS-NAME    PIC X(20).
+
+<span class="cm">* 全角「山田太郎」を格納 → EBCDIC環境では各文字4バイト = 16バイト</span>
+<span class="cm">* PIC X(20)に「山田太郎」+ 半角スペース4個で20バイト</span>
+MOVE "山田太郎" TO WS-NAME
+
+<span class="cm">* 部分参照で苗字だけ取りたい</span>
+MOVE WS-NAME(1:4) TO WS-LAST-NAME   <span class="cm">← 全角なら"山"の途中！文字化け</span>
+
+<span class="cm">* 文字数カウントも混乱する</span>
+INSPECT WS-NAME TALLYING WS-CNT FOR ALL " "
+<span class="cm">← 半角スペースを数えているつもりが全角スペースを見落とす</span></div>
+
+<div class="code"><span class="code-label">✅ 正しい例（全角はPIC Nで明示的に定義）</span><span class="cm">* 全角専用：PIC N（DBCS）</span>
+01 WS-NAME-KANJI  PIC N(10).    <span class="cm">← 全角10文字 = 20バイト（EBCDIC環境）</span>
+01 WS-NAME-KANA   PIC X(20).   <span class="cm">← 半角カナ20文字</span>
+01 WS-NAME-MIXED  PIC X(40).   <span class="cm">← 混在はバイト数で管理し桁を余裕持つ</span>
+
+<span class="cm">* 全角文字の部分参照は文字単位で</span>
+MOVE WS-NAME-KANJI(1:2) TO WS-LAST  <span class="cm">← 全角2文字（"山田"）</span>
+<span class="cm">* ※PIC Nの部分参照は全角文字単位（処理系依存に注意）</span></div>
+
+<p><strong>なぜ起きるか：</strong>日本の汎用機（IBM、富士通、日立）はEBCDICベースで、全角文字は1文字2〜4バイトです。これを意識せずにPIC Xで定義すると、部分参照の開始位置がバイト位置なのか文字位置なのかが曖昧になります。特に<strong>シフトIN/シフトOUT</strong>コード（全角領域の開始・終了を示す制御文字）が混入するEBCDIC環境では、文字列操作が一層複雑になります。</p>
+
+<div class="box box-info">
+<strong>シフトIN/OUTとは</strong><br>
+IBM EBCDIC環境では全角文字の前に「シフトアウト（X'0E'）」、後に「シフトイン（X'0F'）」という制御文字が挿入されます。<br>
+例：「A山B」= <code>X'C1' X'0E' X'8ABD' X'0F' X'C2'</code>（5バイト）<br>
+これを意識せず部分参照で「2文字目から」と取ると制御文字ごと切り取ってしまい、後続システムで文字化けします。移行時の最大の落とし穴の一つです。
+</div>
+
+<h2>総まとめ——「汚いコード」遭遇時のサバイバルガイド</h2>
+
+<table class="tbl">
+<tr><th>パターン</th><th>遭遇時の対処法</th><th>危険度</th></tr>
+<tr><td>浮動小数点演算</td><td>COMP-3への置き換え。テストで誤差検証を必ず実施</td><td style="color:var(--hard)">🔴 高</td></tr>
+<tr><td>未初期化数値項目</td><td>VALUE ZEROを全数値項目に追加。IS NUMERICチェック導入</td><td style="color:var(--hard)">🔴 高</td></tr>
+<tr><td>部分参照の多用</td><td>レベル構造に書き直し。桁数一覧表を必ず作成</td><td style="color:var(--mid)">🟡 中</td></tr>
+<tr><td>REDEFINES多重</td><td>88レベルで種別を明示。処理ごとにCOPY句で分離</td><td style="color:var(--mid)">🟡 中</td></tr>
+<tr><td>10進カウンタ</td><td>COMP / INDEXED BYに置き換え。性能測定で効果確認</td><td style="color:var(--mid)">🟡 中</td></tr>
+<tr><td>GOTO輻輳</td><td>フローチャート起こし→PERFORM構造化が先決。ALTER GO TOは即廃止</td><td style="color:var(--hard)">🔴 高</td></tr>
+<tr><td>全角半角混在</td><td>PIC N / PIC Xを明確に分離。シフトIN/OUTの位置を仕様書化</td><td style="color:var(--hard)">🔴 高</td></tr>
+</table>
+
+<div class="box box-king">
+<strong>レガシーコードは「過去の合理的判断の積み重ね」</strong><br>
+これらの「汚いコード」は、当時の技術者が最善を尽くした結果です。ディスクが高価だったから圧縮した。処理系が未熟だったからGOTOで逃げた。全角対応が後付けだったから混在した。<br><br>
+批判より理解を。理解した上で、現代の技術で正しく書き直す——それがモダナイゼーションエンジニアの仕事です。<br><br>
+あなたはこの図鑑を読み終えました。現実のレガシーCOBOLに立ち向かう準備が整っています。
+</div>`
+  }
+];
+
+// ── サイドバーとページを生成 ──
+const nav = document.getElementById('sidebar-nav');
+const main = document.getElementById('main');
+const completed = new Set(JSON.parse(localStorage.getItem('cobol_done')||'[]'));
+
+CHAPTERS.forEach(ch => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-ch-btn' + (completed.has(ch.id)?' done':'') + (ch.id===0?' active':'');
+  btn.dataset.id = ch.id;
+  const navLabel = ch.title.startsWith('付録') ? '付録　汚いコード図鑑' : ch.title.replace('第'+ch.id+'章　','').split('——')[0];
+  btn.innerHTML = `<span class="nav-num">${ch.id===11?'AP':String(ch.id).padStart(2,'0')}</span>${navLabel}${completed.has(ch.id)?'<span class="check-icon">✓</span>':''}`;
+  btn.onclick = () => showChapter(ch.id);
+  nav.appendChild(btn);
+
+  const page = document.createElement('div');
+  page.className = 'chapter-page' + (ch.id===0?' active':'');
+  page.id = 'ch-'+ch.id;
+  page.innerHTML = `
+    <div class="ch-header fade-in">
+      <div class="ch-tag">${ch.id===11?'APPENDIX':'CHAPTER '+String(ch.id).padStart(2,'0')+' / '+(CHAPTERS.length-2)}</div>
+      <div class="ch-title">${ch.title}</div>
+      <div class="ch-desc">${ch.sub}</div>
+    </div>
+    ${ch.content}
+    <div class="ch-nav">
+      <button class="ch-nav-btn" onclick="showChapter(${ch.id-1})" ${ch.id===0?'disabled':''}>← 前の章</button>
+      <span class="ch-progress">${ch.id===11?'付録':ch.id+' / '+(CHAPTERS.length-2)}</span>
+      <button class="ch-nav-btn primary" onclick="markDone(${ch.id})">${ch.id===CHAPTERS.length-1?'付録を完了する 🎓':ch.id===10?'学習完了！👑':'この章を完了して次へ →'}</button>
+    </div>`;
+  main.appendChild(page);
+});
+
+function showChapter(id) {
+  if (id < 0 || id >= CHAPTERS.length) return;
+  document.querySelectorAll('.chapter-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-ch-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('ch-'+id).classList.add('active');
+  document.querySelector(`.nav-ch-btn[data-id="${id}"]`).classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function markDone(id) {
+  completed.add(id);
+  try { localStorage.setItem('cobol_done', JSON.stringify([...completed])); } catch(e){}
+  const btn = document.querySelector(`.nav-ch-btn[data-id="${id}"]`);
+  btn.classList.add('done');
+  if (!btn.querySelector('.check-icon')) {
+    const span = document.createElement('span');
+    span.className = 'check-icon'; span.textContent = '✓';
+    btn.appendChild(span);
+  }
+  updateProgress();
+  if (id < CHAPTERS.length-1) showChapter(id+1);
+  else alert('🎉 全章完了！COBOL王100問チャレンジに挑戦しましょう！');
+}
+
+function updateProgress() {
+  const done = completed.size;
+  const total = CHAPTERS.length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('sp-fill').style.width = pct+'%';
+  document.getElementById('sp-pct').textContent = done+' / '+total+' 章完了';
+}
+
+function qpick(btn, chosen, correct) {
+  const block = btn.closest('.quiz-block');
+  if (block.dataset.done) return;
+  block.dataset.done = '1';
+  const opts = block.querySelectorAll('.quiz-opt');
+  opts.forEach((o,i) => {
+    o.disabled = true;
+    if (i===correct) o.classList.add('correct');
+    else if (i===chosen && chosen!==correct) o.classList.add('wrong');
+  });
+  block.querySelector('.quiz-exp').classList.add('show');
+}
+
+updateProgress();
+</script>
+</body>
+</html>

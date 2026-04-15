@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COBOL王 100問チャレンジ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+:root {
+  --gold:#c9a84c; --gold-light:#f0d080; --gold-dark:#8a6a1a;
+  --bg:#0a0a0f; --bg2:#12121a; --bg3:#1a1a28; --border:#2a2a40;
+  --text:#e8e4d8; --text2:#9a9480;
+  --easy:#4caf82; --mid:#e8a030; --hard:#e84c4c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,168,76,.08) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 80%,rgba(201,168,76,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.site-header{text-align:center;padding:3rem 0 2rem;}
+.crown{font-size:48px;line-height:1;display:block;margin-bottom:12px;}
+.site-title{font-size:clamp(28px,6vw,48px);font-weight:900;letter-spacing:.12em;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,.4);line-height:1.2;}
+.site-sub{font-size:13px;color:var(--text2);letter-spacing:.2em;margin-top:8px;font-family:'Share Tech Mono',monospace;}
+.progress-wrap{margin:2rem 0 1.5rem;}
+.progress-meta{display:flex;justify-content:space-between;font-size:12px;font-family:'Share Tech Mono',monospace;color:var(--text2);margin-bottom:8px;}
+.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:4px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));border-radius:2px;transition:width .5s ease;}
+.rank-dots{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s;flex-shrink:0;}
+.dot.correct{background:var(--easy);}
+.dot.wrong{background:var(--hard);}
+.dot.current{background:var(--gold);box-shadow:0 0 6px var(--gold);}
+.score-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+.score-cell{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.score-cell .val{font-size:24px;font-weight:700;font-family:'Share Tech Mono',monospace;}
+.score-cell .lbl{font-size:11px;color:var(--text2);margin-top:4px;font-family:'Share Tech Mono',monospace;}
+.val-c{color:var(--easy);} .val-w{color:var(--hard);} .val-p{color:var(--gold);}
+.diff-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;letter-spacing:.1em;margin-bottom:10px;}
+.d-easy{background:rgba(76,175,130,.15);color:var(--easy);border:.5px solid rgba(76,175,130,.4);}
+.d-mid{background:rgba(232,160,48,.15);color:var(--mid);border:.5px solid rgba(232,160,48,.4);}
+.d-hard{background:rgba(232,76,76,.15);color:var(--hard);border:.5px solid rgba(232,76,76,.4);}
+.q-card{background:var(--bg2);border:.5px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+.q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;}
+.q-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);margin-bottom:6px;letter-spacing:.15em;}
+.q-cat{font-size:11px;color:var(--text2);margin-bottom:12px;}
+.q-text{font-size:15px;line-height:1.85;color:var(--text);margin-bottom:16px;}
+.code-block{background:#080810;border:.5px solid var(--border);border-radius:10px;padding:14px 18px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:2;color:#b8e0b8;white-space:pre;overflow-x:auto;margin-bottom:20px;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt-btn{background:var(--bg3);border:.5px solid var(--border);border-radius:10px;padding:12px 16px;font-family:'Noto Serif JP',serif;font-size:14px;color:var(--text);text-align:left;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:border-color .15s,background .15s;}
+.opt-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(201,168,76,.06);}
+.opt-btn.correct{background:rgba(76,175,130,.12);border-color:var(--easy);color:#7fe0b0;}
+.opt-btn.wrong{background:rgba(232,76,76,.12);border-color:var(--hard);color:#f09090;}
+.opt-lbl{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--gold);min-width:20px;margin-top:1px;}
+.explanation{background:rgba(201,168,76,.06);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:14px 16px;font-size:13px;line-height:1.85;color:var(--text2);margin-top:14px;display:none;}
+.explanation.show{display:block;}
+.explanation strong{color:var(--gold-light);}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;}
+.nav-btn{background:transparent;border:.5px solid var(--border);border-radius:8px;padding:10px 22px;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text2);cursor:pointer;transition:border-color .15s,color .15s;}
+.nav-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed;}
+.nav-btn.primary{border-color:var(--gold);color:var(--gold);}
+.start-screen{text-align:center;padding:2rem 0;}
+.start-desc{font-size:14px;color:var(--text2);line-height:1.9;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;}
+.start-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2rem;}
+.start-cell{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:16px 10px;}
+.start-cell .num{font-size:28px;font-weight:700;font-family:'Share Tech Mono',monospace;}
+.start-cell .label{font-size:11px;color:var(--text2);margin-top:4px;}
+.start-btn{background:var(--gold);color:#0a0a0f;border:none;border-radius:12px;padding:16px 48px;font-family:'Noto Serif JP',serif;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.12em;transition:opacity .15s,transform .1s;}
+.start-btn:hover{opacity:.9;transform:translateY(-1px);}
+.result-screen{text-align:center;padding:1rem 0;}
+.result-title{font-size:clamp(24px,5vw,40px);font-weight:900;color:var(--gold);margin:1rem 0 .5rem;text-shadow:0 0 30px rgba(201,168,76,.5);}
+.result-sub{font-size:14px;color:var(--text2);margin-bottom:2rem;font-family:'Share Tech Mono',monospace;}
+#title-card-wrap{margin:2rem auto;max-width:500px;}
+canvas#titleCanvas{width:100%;border-radius:12px;display:block;}
+.save-btn{margin-top:16px;width:100%;background:var(--gold);color:#0a0a0f;border:none;border-radius:10px;padding:14px;font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.1em;transition:opacity .15s;}
+.save-btn:hover{opacity:.85;}
+.retry-btn{margin-top:12px;width:100%;background:transparent;color:var(--text2);border:.5px solid var(--border);border-radius:10px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s;}
+.retry-btn:hover{border-color:var(--gold);color:var(--gold);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease;}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="site-header">
+  <span class="crown">&#128081;</span>
+  <div class="site-title">COBOL&#x738b;<br>100&#x554f;&#x30c1;&#x30e3;&#x30ec;&#x30f3;&#x30b8;</div>
+  <div class="site-sub">&#x5168;&#x554f;&#x6b63;&#x89e3;&#x8005;&#x306b;&#x79f0;&#x53f7;&#x304c;&#x6388;&#x4e0e;&#x3055;&#x308c;&#x307e;&#x3059;</div>
+</header>
+<div id="app"></div>
+</div>
+<script>
+const TOTAL=100;
+const QS=[
+  // EASY 1-33
+  {diff:'easy',cat:'データ定義',q:'PIC 9(4) で定義できる最大値はいくつか。',code:'',opts:['999','9999','99999','9(4)は文字のみ'],ans:1,exp:'PIC 9(4) は4桁の数値項目を定義します。各桁が0〜9を取れるため最大値は <strong>9999</strong> です。'},
+  {diff:'easy',cat:'MOVE文',q:'次のコードを実行後、WS-B の値はいくつか。',code:'01 WS-A PIC 9(3) VALUE 123.\n01 WS-B PIC 9(5).\n\nMOVE WS-A TO WS-B',opts:['00123','123  ','12300','エラー'],ans:0,exp:'数値項目へのMOVEは右寄せゼロ埋めで格納されます。123 を PIC 9(5) に移すと <strong>00123</strong> になります。'},
+  {diff:'easy',cat:'データ定義',q:'PIC X(5) VALUE "ABC" と定義したとき、内部に格納される値はどれか。',code:'',opts:['ABC  (右2スペース)','  ABC(左2スペース)','ABC\\0\\0','エラー'],ans:0,exp:'英数字項目（X）は左寄せで格納され、残りはスペースで埋められます。"ABC" は <strong>"ABC  "</strong>（右に2スペース）として格納されます。'},
+  {diff:'easy',cat:'演算',q:'次のコードを実行後、WS-C の値はいくつか。',code:'01 WS-A PIC 9(2) VALUE 10.\n01 WS-B PIC 9(2) VALUE 03.\n01 WS-C PIC 9(2).\n\nADD WS-A TO WS-B GIVING WS-C',opts:['10','03','13','エラー'],ans:2,exp:'ADD A TO B GIVING C は A+B の結果を C に格納します。10+3 = <strong>13</strong>。WS-AとWS-Bの値は変わりません。'},
+  {diff:'easy',cat:'条件分岐',q:'IF WS-NUM > 0 AND WS-NUM < 10 が真になるのはどれか。',code:'',opts:['WS-NUM = 0','WS-NUM = 5','WS-NUM = 10','WS-NUM = -1'],ans:1,exp:'AND条件は両方が真のとき成立します。0 < 5 < 10 を満たすのは <strong>WS-NUM = 5</strong> のみです。'},
+  {diff:'easy',cat:'PERFORM',q:'次のコードは何回 DISPLAY を実行するか。',code:'PERFORM 5 TIMES\n    DISPLAY "HELLO"\nEND-PERFORM',opts:['4回','5回','6回','0回'],ans:1,exp:'PERFORM n TIMES は指定した回数だけ繰り返します。<strong>5回</strong>実行されます。'},
+  {diff:'easy',cat:'データ定義',q:'COMP-3（パック10進数）で PIC 9(3) を定義したとき、占有バイト数はいくつか。',code:'',opts:['1バイト','2バイト','3バイト','4バイト'],ans:1,exp:'COMP-3は(桁数+1)÷2を切り上げたバイト数を使用します。9(3)は(3+1)/2 = <strong>2バイト</strong>。'},
+  {diff:'easy',cat:'文字列操作',q:'INSPECT 文の TALLYING オプションの用途として正しいものはどれか。',code:'',opts:['文字列を置換する','文字の出現回数を数える','文字列を結合する','文字列を分割する'],ans:1,exp:'INSPECT～TALLYINGは指定した文字が何回出現するかを <strong>数える</strong>ために使います。置換にはREPLACINGを使います。'},
+  {diff:'easy',cat:'条件分岐',q:'EVALUATE 文においてすべての WHEN 条件に該当しない場合に実行される句はどれか。',code:'',opts:['WHEN ZERO','WHEN OTHER','WHEN ANY','ELSE'],ans:1,exp:'EVALUATE文でどのWHENにも一致しない場合は <strong>WHEN OTHER</strong> 句が実行されます。IF文のELSEに相当します。'},
+  {diff:'easy',cat:'演算',q:'次のコードを実行後、WS-ANS の値はいくつか。',code:'01 WS-ANS PIC 9(4).\n\nCOMPUTE WS-ANS = 3 ** 3',opts:['6','9','27','33'],ans:2,exp:'COMPUTE文で ** は累乗を表します。3の3乗 = 3×3×3 = <strong>27</strong>。'},
+  {diff:'easy',cat:'データ定義',q:'PIC S9(4) の "S" は何を意味するか。',code:'',opts:['文字列型','符号付き数値','単精度浮動小数','サブスクリプト型'],ans:1,exp:'PIC句のSは <strong>符号付き（Signed）</strong>を意味します。S9(4)は -9999〜9999 の範囲を格納できます。'},
+  {diff:'easy',cat:'MOVE文',q:'MOVE SPACES TO WS-STR を実行したとき、WS-STR に格納されるのはどれか。',code:'01 WS-STR PIC X(5).',opts:['00000','5個のスペース','SPACE','何も変わらない'],ans:1,exp:'SPACESはすべてスペースで埋めるフィギュアリテラルです。PIC X(5) に MOVE SPACES すると <strong>5個のスペース</strong>が格納されます。'},
+  {diff:'easy',cat:'PERFORM',q:'PERFORM UNTIL の条件判定のタイミングはどれか。',code:'',opts:['ループ後に判定','ループ前に判定','ループ中に判定','判定しない'],ans:1,exp:'PERFORM UNTILはループの <strong>前に条件を判定</strong>します（前判定）。最初から条件が真なら一度も実行されません。'},
+  {diff:'easy',cat:'演算',q:'SUBTRACT 5 FROM WS-NUM を実行後、WS-NUM の値はいくつか。',code:'01 WS-NUM PIC 9(3) VALUE 020.',opts:['015','025','005','エラー'],ans:0,exp:'SUBTRACT A FROM B は B = B - A を実行します。020 - 5 = <strong>015</strong>。結果はFROMの対象変数に上書きされます。'},
+  {diff:'easy',cat:'ファイル操作',q:'OPEN 文で INPUT モードを指定するとどうなるか。',code:'',opts:['読み書き両方できる','読み取り専用になる','書き込み専用になる','ファイルを消去する'],ans:1,exp:'OPEN INPUTはファイルを <strong>読み取り専用</strong>で開きます。OPEN OUTPUTは書き込み専用、OPEN I-Oは読み書き両方です。'},
+  {diff:'easy',cat:'データ定義',q:'PIC 9(3)V99 は何を表すか。',code:'',opts:['3桁整数','3桁整数2桁小数','小数点付き5桁数値','コンパイルエラー'],ans:1,exp:'Vは仮想小数点を表します。PIC 9(3)V99は <strong>3桁整数・2桁小数</strong>の数値型です。実際には小数点文字は格納されず内部的な位置として扱われます。'},
+  {diff:'easy',cat:'条件分岐',q:'IF WS-A = ZERO の条件が真になるのはどれか。',code:'01 WS-A PIC 9(3).',opts:['WS-A = 1','WS-A = 000','WS-A = SPACE','WS-A = "0"'],ans:1,exp:'ZERO（ZEROESまたはZEROS）は数値の0を表すフィギュアリテラルです。PIC 9(3)の場合 <strong>000</strong> のときに真になります。'},
+  {diff:'easy',cat:'PERFORM',q:'PERFORM A THRU B を実行したとき、どの段落が実行されるか。',code:'A. DISPLAY "A".\nB. DISPLAY "B".\nC. DISPLAY "C".',opts:['Aのみ','Bのみ','AとBの両方','A・B・Cすべて'],ans:2,exp:'PERFORM A THRU BはAからBまでを <strong>順に実行</strong>します。AとBが実行されCは実行されません。'},
+  {diff:'easy',cat:'文字列操作',q:'STRING 文で DELIMITED BY SIZE を指定すると、どこまでの文字を結合するか。',code:'',opts:['スペースまで','ヌル文字まで','PICで定義した全桁分','先頭1文字のみ'],ans:2,exp:'DELIMITED BY SIZEは送信元変数の <strong>PICで定義した全桁数分</strong>を使用します。DELIMITED BY SPACEはスペースの手前まで使用します。'},
+  {diff:'easy',cat:'配列',q:'OCCURS 5 TIMES で定義した配列のインデックスの有効範囲はどれか。',code:'01 WS-TBL.\n   05 WS-ITEM OCCURS 5 TIMES PIC 9.',opts:['0〜4','1〜5','0〜5','1〜4'],ans:1,exp:'COBOLの配列インデックスは <strong>1から始まり</strong>OCCURSで指定した数が上限です。OCCURS 5 TIMESなら1〜5が有効範囲です。'},
+  {diff:'easy',cat:'演算',q:'DIVIDE 10 BY 3 GIVING WS-Q REMAINDER WS-R を実行後、WS-R はいくつか。',code:'01 WS-Q PIC 9.\n01 WS-R PIC 9.',opts:['0','1','2','3'],ans:1,exp:'REMAINDER句は整数除算の余りを格納します。10÷3 = 商3 余り <strong>1</strong>。WS-Q=3、WS-R=1となります。'},
+  {diff:'easy',cat:'データ定義',q:'COMP（バイナリ）で PIC 9(4) を定義したとき、占有バイト数はいくつか。',code:'',opts:['1バイト','2バイト','4バイト','8バイト'],ans:1,exp:'COMP（BINARY）は9(1)〜9(4)で <strong>2バイト</strong>、9(5)〜9(9)で4バイト、9(10)〜9(18)で8バイトを使用します。'},
+  {diff:'easy',cat:'ファイル操作',q:'順編成ファイルのREAD文でファイルの終端を検出するには何を使うか。',code:'',opts:['AT END','INVALID KEY','END-OF-FILE','NOT FOUND'],ans:0,exp:'順編成ファイルのREAD文では <strong>AT END</strong> 句でファイルの終端を検出します。INVALID KEYは索引編成ファイルなどで使います。'},
+  {diff:'easy',cat:'条件分岐',q:'88レベルの条件名項目を使うメリットとして正しいものはどれか。',code:'01 WS-SEX PIC X.\n   88 MALE   VALUE "M".\n   88 FEMALE VALUE "F".',opts:['処理速度が速くなる','コードの可読性が上がる','メモリを節約できる','型チェックが厳しくなる'],ans:1,exp:'88レベルの条件名項目は数値や文字コードを意味のある名前で表現できます。IF MALEのように書けるため <strong>コードの可読性</strong>が大幅に向上します。'},
+  {diff:'easy',cat:'MOVE文',q:'MOVE ZEROS TO WS-NUM を実行した後の WS-NUM の値はどれか。',code:'01 WS-NUM PIC 9(4).',opts:['ZERO','0000','スペース4個','変わらない'],ans:1,exp:'ZEROS（ZERO・ZEROES）は数値フィギュアリテラルで数値項目の全桁を <strong>0</strong> で埋めます。PIC 9(4) なら <strong>0000</strong> になります。'},
+  {diff:'easy',cat:'サブプログラム',q:'CALL 文でサブプログラムを呼び出すとき、データを渡す方法はどれか。',code:'',opts:['SEND句','USING句','PASS句','GIVING句'],ans:1,exp:'CALL文ではサブプログラムにデータを渡すために <strong>USING 句</strong>を使います。'},
+  {diff:'easy',cat:'データ定義',q:'REDEFINES 句の目的として正しいものはどれか。',code:'',opts:['変数を削除する','同じ記憶域を別名で参照する','変数のサイズを変更する','初期値を設定する'],ans:1,exp:'REDEFINESは <strong>同一のメモリ領域</strong>を異なるデータ名と形式で参照するために使います。C言語のunionに相当します。'},
+  {diff:'easy',cat:'演算',q:'MULTIPLY 7 BY WS-NUM を実行後、WS-NUM の値はいくつか。',code:'01 WS-NUM PIC 9(3) VALUE 004.',opts:['007','011','028','047'],ans:2,exp:'MULTIPLY A BY B は B = B×A を実行します。4×7 = <strong>28</strong>（028）。'},
+  {diff:'easy',cat:'PERFORM',q:'PERFORM VARYING I FROM 1 BY 1 UNTIL I > 3 は何回ループするか。',code:'01 I PIC 9.',opts:['2回','3回','4回','無限ループ'],ans:1,exp:'I=1,2,3のときにループ処理が実行され、I=4になったとき条件(I>3)が真となりループ終了。合計 <strong>3回</strong>実行されます。'},
+  {diff:'easy',cat:'文字列操作',q:'UNSTRING 文の用途として正しいものはどれか。',code:'',opts:['文字列を結合する','文字列を分割して複数変数に格納する','文字を置換する','文字数を数える'],ans:1,exp:'UNSTRING文は1つの文字列を区切り文字で <strong>分割</strong>し、複数の変数に格納します。STRINGの逆操作です。'},
+  {diff:'easy',cat:'ファイル操作',q:'WRITE 文で BEFORE ADVANCING 2 LINES を指定するとどうなるか。',code:'',opts:['2行前のデータを書き込む','書き込み後に2行改行する','書き込み前に2行改行する','2回書き込む'],ans:2,exp:'BEFORE ADVANCING n LINESは <strong>書き込み前</strong>にn行改行します。AFTER ADVANCINGは書き込み後に改行します。'},
+  {diff:'easy',cat:'データ定義',q:'01レベルの項目の下位に定義できるレベル番号の範囲はどれか。',code:'',opts:['01〜49','02〜49','02〜99','10〜49'],ans:1,exp:'COBOLのデータ階層は01が最上位で、下位項目は <strong>02〜49</strong> のレベル番号を使います。66・77・88は特殊用途です。'},
+  {diff:'easy',cat:'条件分岐',q:'CONTINUE 文の用途として正しいものはどれか。',code:'',opts:['ループを次の繰り返しにスキップ','何もしない（空の処理）','プログラムを終了する','次の段落に分岐する'],ans:1,exp:'CONTINUE文は <strong>何もしない</strong>ことを明示的に示す文です。IF文のELSE側で「何もしない」ブランチを明示したいときに使います。'},
+
+  // MID 34-67
+  {diff:'mid',cat:'桁あふれ',q:'次のコードを実行したとき、WS-ANS の値はいくつか。',code:'01 WS-A   PIC 9(2) VALUE 99.\n01 WS-B   PIC 9(2) VALUE 05.\n01 WS-ANS PIC 9(2).\n\nMULTIPLY WS-A BY WS-B GIVING WS-ANS',opts:['495','95','45','エラー'],ans:1,exp:'99×5=495ですが、WS-ANSはPIC 9(2)のため上位桁が脱落し <strong>95</strong> が格納されます。COBOLでは桁あふれはエラーにならず切り捨てられます。'},
+  {diff:'mid',cat:'EVALUATE',q:'WS-SCORE = 85 のとき、WS-GRADE に格納される値はどれか。',code:'EVALUATE TRUE\n    WHEN WS-SCORE >= 90\n        MOVE "A" TO WS-GRADE\n    WHEN WS-SCORE >= 80\n        MOVE "B" TO WS-GRADE\n    WHEN WS-SCORE >= 70\n        MOVE "C" TO WS-GRADE\n    WHEN OTHER\n        MOVE "D" TO WS-GRADE\nEND-EVALUATE',opts:['"A"','"B"','"C"','"D"'],ans:1,exp:'EVALUATE TRUEは上から順に評価し最初に真になったWHENを実行します。85>=90は偽、85>=80は <strong>真</strong>なので "B" が格納されます。'},
+  {diff:'mid',cat:'STRING文',q:'次のコードを実行後、WS-OUT に格納される値はどれか。',code:'01 WS-A   PIC X(5) VALUE "TOKYO".\n01 WS-B   PIC X(3) VALUE "123".\n01 WS-OUT PIC X(9).\n\nSTRING WS-A DELIMITED BY SIZE\n       "-"  DELIMITED BY SIZE\n       WS-B DELIMITED BY SIZE\n       INTO WS-OUT',opts:['"TOKYO-123"','"TOKYO123 "','"123-TOKYO"','"TOKYO-12 "'],ans:0,exp:'STRING文は指定順に文字列を連結します。"TOKYO"(5)+"-"(1)+"123"(3) = <strong>"TOKYO-123"</strong>（計9文字）。'},
+  {diff:'mid',cat:'SEARCH',q:'次のコードで WS-KEY = 40 のとき SEARCH 実行後、WS-IDX の値はいくつか。',code:'01 WS-TABLE.\n   05 WS-ITEM OCCURS 5 TIMES\n              INDEXED BY WS-IDX PIC 9(2).\n\nMOVE 10 TO WS-ITEM(1)\nMOVE 20 TO WS-ITEM(2)\nMOVE 30 TO WS-ITEM(3)\nMOVE 40 TO WS-ITEM(4)\nMOVE 50 TO WS-ITEM(5)\nSET WS-IDX TO 1\nSEARCH WS-ITEM\n    AT END CONTINUE\n    WHEN WS-ITEM(WS-IDX) = WS-KEY\n        CONTINUE\nEND-SEARCH',opts:['1','2','4','5'],ans:2,exp:'SEARCHは先頭から順に比較します。IDX=1→10≠40、2→20≠40、3→30≠40、4→40=40で一致。終了後もインデックスは発見位置 <strong>4</strong> のままです。'},
+  {diff:'mid',cat:'REDEFINES',q:'次の定義で WS-DATA に "AB" を MOVE した後、WS-C1 と WS-C2 の値はどれか。',code:'01 WS-DATA PIC X(2).\n01 WS-REDEF REDEFINES WS-DATA.\n   05 WS-C1 PIC X(1).\n   05 WS-C2 PIC X(1).',opts:['WS-C1="A" WS-C2="B"','WS-C1="B" WS-C2="A"','WS-C1="AB" WS-C2="  "','エラー'],ans:0,exp:'REDEFINESは同じメモリを別名で参照します。先頭1バイト=WS-C1=<strong>"A"</strong>、次の1バイト=WS-C2=<strong>"B"</strong>。'},
+  {diff:'mid',cat:'COMP-3',q:'PIC S9(5) COMP-3 のバイト数はいくつか。',code:'',opts:['2バイト','3バイト','4バイト','5バイト'],ans:1,exp:'COMP-3のバイト数 = ⌈(桁数+1)÷2⌉。S9(5)は(5+1)/2 = <strong>3バイト</strong>。格納イメージ: 12 34 5C（Cは正符号）。'},
+  {diff:'mid',cat:'PERFORM VARYING',q:'次のコードを実行後、WS-SUM の値はいくつか。',code:'01 WS-SUM PIC 9(4) VALUE 0.\n01 WS-I   PIC 9(2).\n\nPERFORM VARYING WS-I FROM 2 BY 2\n        UNTIL WS-I > 10\n    ADD WS-I TO WS-SUM\nEND-PERFORM',opts:['20','25','30','55'],ans:2,exp:'WS-I = 2, 4, 6, 8, 10 のとき加算（WS-I=12で終了）。2+4+6+8+10 = <strong>30</strong>。FROM 2 BY 2で2ずつ増加します。'},
+  {diff:'mid',cat:'ファイル操作',q:'索引編成ファイルへの WRITE で同じキー値のレコードがすでに存在するとき何が起きるか。',code:'',opts:['上書きされる','INVALID KEY句が実行される','AT END句が実行される','ファイルが壊れる'],ans:1,exp:'索引編成ファイルで重複キーのWRITEを行うと <strong>INVALID KEY</strong> 句が実行されます。'},
+  {diff:'mid',cat:'88レベル',q:'次の定義で IF HOLIDAY が真になる条件はどれか。',code:'01 WS-DAY PIC X.\n   88 WEEKDAY VALUE "1" "2" "3" "4" "5".\n   88 HOLIDAY VALUE "6" "7".',opts:['WS-DAY = "1"','WS-DAY = "5"','WS-DAY = "6"','WS-DAY = "0"'],ans:2,exp:'HOLIDAYのVALUEには "6" と "7" が定義されています。WS-DAY = <strong>"6"</strong> のとき IF HOLIDAY が真になります。'},
+  {diff:'mid',cat:'部分参照',q:'次のコードを実行後、WS-OUT の値はどれか。',code:'01 WS-STR PIC X(10) VALUE "MAINFRAME ".\n01 WS-OUT PIC X(4).\n\nMOVE WS-STR(5:4) TO WS-OUT',opts:['"MAIN"','"FRAM"','"RAME"','"AINF"'],ans:1,exp:'部分参照 変数名(開始位置:長さ) で文字列の一部を取得します。"MAINFRAME " の5文字目から4文字は <strong>"FRAM"</strong>。COBOLの位置は1始まりです。'},
+  {diff:'mid',cat:'INSPECT',q:'次のコードを実行後、WS-CNT の値はいくつか。',code:'01 WS-STR PIC X(10) VALUE "ABCABCABCA".\n01 WS-CNT PIC 9 VALUE 0.\n\nINSPECT WS-STR\n    TALLYING WS-CNT FOR ALL "A"',opts:['2','3','4','5'],ans:2,exp:'"ABCABCABCA" の中に "A" は位置1,4,7,10 の <strong>4回</strong>登場します。TALLYING FOR ALLは文字列全体での出現回数を数えます。'},
+  {diff:'mid',cat:'UNSTRING',q:'次のコードを実行後、WS-P2 の値はどれか。',code:'01 WS-IN  PIC X(12) VALUE "TOKYO,OSAKA,".\n01 WS-P1  PIC X(5).\n01 WS-P2  PIC X(5).\n\nUNSTRING WS-IN\n    DELIMITED BY ","\n    INTO WS-P1 WS-P2',opts:['"TOKYO"','"OSAKA"','"OSAKA,"','"     "'],ans:1,exp:'UNSTRINGはカンマで分割します。最初のカンマまでがWS-P1="TOKYO"、次のカンマまでがWS-P2=<strong>"OSAKA"</strong>（右スペース埋め）になります。'},
+  {diff:'mid',cat:'ON SIZE ERROR',q:'ON SIZE ERROR 句はどのような状況で実行されるか。',code:'',opts:['構文エラー時','演算結果が格納先の桁数を超えたとき','ファイルが存在しないとき','変数が未定義のとき'],ans:1,exp:'ON SIZE ERRORは算術演算文で <strong>演算結果が格納先変数の桁数を超えた（桁あふれ）</strong>ときに実行されます。'},
+  {diff:'mid',cat:'CALL文',q:'BY REFERENCE でサブプログラムにデータを渡したとき、どうなるか。',code:'',opts:['コピーが渡される','アドレスが渡され変更が呼び出し元に反映される','読み取り専用で渡される','定数として渡される'],ans:1,exp:'BY REFERENCEは変数の <strong>アドレス（参照）</strong>を渡します。サブプログラムが値を変更すると呼び出し元の変数にも反映されます。'},
+  {diff:'mid',cat:'SEARCH ALL',q:'SEARCH ALL（二分探索）を使う前提条件はどれか。',code:'',opts:['配列サイズが奇数であること','配列がキーでソートされていること','配列要素数が100以下であること','INDEXED BY句が不要であること'],ans:1,exp:'SEARCH ALL（二分探索）は配列が <strong>昇順または降順にソート</strong>されていることが前提です。ASCENDING KEY / DESCENDING KEY句の定義も必要です。'},
+  {diff:'mid',cat:'データ定義',q:'LINKAGE SECTION の用途として正しいものはどれか。',code:'',opts:['ファイルのレコード定義','サブプログラムで受け取るパラメータの定義','定数の定義','グローバル変数の定義'],ans:1,exp:'LINKAGE SECTIONは <strong>呼び出し元からCALL文で渡されるデータ</strong>を定義します。実際の記憶域は呼び出し元が管理します。'},
+  {diff:'mid',cat:'条件分岐',q:'次のコードを実行後、DISPLAY される値はどれか。',code:'01 WS-A PIC 9 VALUE 3.\n01 WS-B PIC 9 VALUE 5.\n\nIF WS-A > 2\n    IF WS-B > 4\n        DISPLAY "X"\n    ELSE\n        DISPLAY "Y"\n    END-IF\nELSE\n    DISPLAY "Z"\nEND-IF',opts:['"X"','"Y"','"Z"','"XY"'],ans:0,exp:'外側のIF: 3>2は真 → 内側のIFへ。内側のIF: 5>4は真 → <strong>"X"</strong> をDISPLAY。ネストしたIF文はEND-IFの対応に注意が必要です。'},
+  {diff:'mid',cat:'演算',q:'DIVIDE 100 BY 7 GIVING WS-Q REMAINDER WS-R を実行後、WS-R はいくつか。',code:'01 WS-Q PIC 9(2).\n01 WS-R PIC 9(2).',opts:['1','2','4','6'],ans:1,exp:'100÷7 = 商14、余り = 100 - 14×7 = 100 - 98 = <strong>2</strong>。WS-R=2。'},
+  {diff:'mid',cat:'PERFORM',q:'WITH TEST AFTER を指定した PERFORM UNTIL は何が変わるか。',code:'',opts:['条件判定がループ前になる','条件判定がループ後になる（最低1回は実行）','ループ回数が2倍になる','無限ループになる'],ans:1,exp:'WITH TEST AFTERを指定すると後判定になり、条件に関わらず <strong>最低1回</strong>はループ本体が実行されます。'},
+  {diff:'mid',cat:'ファイル操作',q:'CLOSE 文を実行せずにプログラムを終了した場合、何が起きる可能性があるか。',code:'',opts:['何も問題ない','レコードが失われたりファイルが壊れる可能性がある','自動的にCLOSEされる','コンパイルエラーになる'],ans:1,exp:'CLOSEなしで終了すると、バッファに残ったデータが書き込まれなかったり <strong>データが失われたりファイルが破損</strong>する可能性があります。'},
+  {diff:'mid',cat:'部分参照',q:'次のコードを実行後、WS-STR の内容はどれか。',code:'01 WS-STR PIC X(6) VALUE "COBOL1".\n\nMOVE "2" TO WS-STR(6:1)',opts:['"COBOL1"','"COBOL2"','"2OBOL1"','"COBOL "'],ans:1,exp:'部分参照WS-STR(6:1)は6文字目から1文字分を指します。"COBOL1"の6文字目"1"を"2"に書き換えるため結果は <strong>"COBOL2"</strong>。'},
+  {diff:'mid',cat:'COMPUTE',q:'次のコードを実行後、WS-ANS の値はどれか。',code:'01 WS-X   PIC 9 VALUE 2.\n01 WS-Y   PIC 9 VALUE 3.\n01 WS-ANS PIC 9(3).\n\nCOMPUTE WS-ANS = (WS-X + WS-Y) ** 2',opts:['13','25','10','49'],ans:1,exp:'まずカッコ内: 2+3=5。次に累乗: 5²= <strong>25</strong>。COMPUTE文では通常の数学的優先順位と括弧が使えます。'},
+  {diff:'mid',cat:'INSPECT REPLACING',q:'次のコードを実行後、WS-STR の値はどれか。',code:'01 WS-STR PIC X(8) VALUE "AAABBBCC".\n\nINSPECT WS-STR\n    REPLACING ALL "A" BY "X"',opts:['"XXXBBBCC"','"XAABBBCC"','"AAABBBCC"','"XXXBBBAA"'],ans:0,exp:'INSPECT REPLACING ALLは文字列中のすべての対象文字を置換します。"AAABBBCC"の"A"（位置1,2,3）を"X"に置換すると <strong>"XXXBBBCC"</strong>。'},
+  {diff:'mid',cat:'配列',q:'OCCURS 3 TIMES で定義した配列をネストした場合（2次元配列）、合計要素数はいくつか。',code:'01 WS-TBL.\n   05 WS-ROW OCCURS 3 TIMES.\n      10 WS-COL OCCURS 3 TIMES PIC 9.',opts:['3','6','9','12'],ans:2,exp:'2次元配列の要素数 = 外側のOCCURSx内側のOCCURSs = 3×3 = <strong>9</strong>。'},
+  {diff:'mid',cat:'EXIT',q:'EXIT PROGRAM 文はどの状況で使うか。',code:'',opts:['主プログラムの終了','サブプログラムからの復帰（呼び出し元に戻る）','ループからの脱出','条件分岐のスキップ'],ans:1,exp:'EXIT PROGRAMは <strong>サブプログラムから呼び出し元に制御を返す</strong>ために使います。主プログラムではSTOP RUNを使います。'},
+  {diff:'mid',cat:'WORKING-STORAGE',q:'FILLER を使うことで何ができるか。',code:'01 WS-REC.\n   05 WS-NAME PIC X(10).\n   05 FILLER  PIC X(2).\n   05 WS-AGE  PIC 9(3).',opts:['変数に別名をつける','名前のないスペース領域を確保する','コメントを埋め込む','変数を削除する'],ans:1,exp:'FILLERは <strong>名前のないデータ領域</strong>を確保するために使います。レコードのパディング（余白）や使用しない領域の予約に利用します。'},
+  {diff:'mid',cat:'条件名',q:'SET 文を使って88レベルの条件名を真にするとどうなるか。',code:'01 WS-FLG PIC X.\n   88 FLAG-ON  VALUE "Y".\n   88 FLAG-OFF VALUE "N".',opts:['エラーになる','対応するVALUEの値が親項目にMOVEされる','条件名の値が変わる','何も変わらない'],ans:1,exp:'SET FLAG-ON TO TRUEを実行すると、FLAG-ONのVALUEである"Y"が親項目WS-FLGに <strong>MOVE</strong> されます。'},
+  {diff:'mid',cat:'ファイル操作',q:'REWRITE 文が使えるのはどのモードで OPEN したファイルか。',code:'',opts:['INPUT','OUTPUT','I-O','EXTEND'],ans:2,exp:'REWRITEは <strong>OPEN I-O</strong>（入出力モード）で開いたファイルに対してのみ実行できます。'},
+  {diff:'mid',cat:'数値編集',q:'PIC Z(4)9 で格納先に 01234 を MOVE したとき表示される値はどれか。',code:'',opts:['01234',' 1234','  234','1234 '],ans:1,exp:'PIC Z(4)9 はZが先行ゼロを空白に変換する数値編集文字です。01234 → 先頭の"0"が空白に → <strong>" 1234"</strong>（スペース+1234）。'},
+  {diff:'mid',cat:'SORT文',q:'SORT 文を使うときに必要な定義はどれか。',code:'',opts:['SORT-MERGE SECTION','SD（Sort Description）によるソートファイルの定義','INDEX による索引定義','SPECIAL-NAMES SECTION'],ans:1,exp:'SORT文を使う場合、FILE SECTIONに <strong>SD（Sort Description）</strong>でソートファイルを定義する必要があります。FD（File Description）とは異なります。'},
+
+  // HARD 68-100
+  {diff:'hard',cat:'桁あふれとON SIZE ERROR',q:'次のコードを実行後の WS-C の値はどれか。',code:'01 WS-A PIC 9(2) VALUE 99.\n01 WS-B PIC 9(2) VALUE 99.\n01 WS-C PIC 9(3).\n\nMULTIPLY WS-A BY WS-B GIVING WS-C\n    ON SIZE ERROR\n        MOVE 0 TO WS-C\nEND-MULTIPLY',opts:['801','000（ON SIZE ERROR発動後）','999','9801'],ans:1,exp:'99×99=9801。PIC 9(3)の最大は999なので桁あふれ発生→ON SIZE ERROR句が実行され <strong>WS-C=000</strong>。ON SIZE ERRORは桁あふれ検出後に格納先を初期化する用途で使います。'},
+  {diff:'hard',cat:'COMP-3格納形式',q:'PIC S9(3)V99 COMP-3 の変数に 123.45 を格納したとき、内部表現（16進）はどれか。',code:'',opts:['12 34 5C','01 23 4D','12 34 5D','01 23 45'],ans:0,exp:'COMP-3はパック10進数です。123.45→仮想小数点を無視して12345を格納。正の数なのでニブルは"C"（正符号）。格納: <strong>12 34 5C</strong>（3バイト）。負数なら"D"。'},
+  {diff:'hard',cat:'SEARCH ALL',q:'SEARCH ALL（二分探索）で10要素の配列から対象を探す場合、最大比較回数はいくつか。',code:'',opts:['2回','3回','4回','10回'],ans:2,exp:'二分探索の最大比較回数 = ⌈log₂(n+1)⌉。n=10の場合、log₂(11)≒3.46→ <strong>4回</strong>。線形探索（SEARCH）の最悪10回に対して大幅に少ない。'},
+  {diff:'hard',cat:'REDEFINES活用',q:'次の定義で WS-DATE に "20240401" を MOVE した後、WS-YEAR の値はどれか。',code:'01 WS-DATE  PIC X(8).\n01 WS-DT    REDEFINES WS-DATE.\n   05 WS-YEAR  PIC X(4).\n   05 WS-MONTH PIC X(2).\n   05 WS-DAY2  PIC X(2).',opts:['"2024"','"0401"','"20240401"','"2024"（変換後の数値）'],ans:0,exp:'REDEFINESによりWS-DATEの先頭4バイトがWS-YEARに対応します。"20240401"の先頭4文字は <strong>"2024"</strong>。レコード分解の定番パターンです。'},
+  {diff:'hard',cat:'CALL BY CONTENT',q:'次のコードでサブプログラム SUB が WS-VAL を変更したとき、主プログラムの WS-NUM の値はどうなるか。',code:'* 主プログラム\n01 WS-NUM PIC 9(3) VALUE 100.\n\nCALL "SUB" USING BY CONTENT WS-NUM\n\n* SUB内\nPROCEDURE DIVISION USING WS-VAL.\n    MOVE 999 TO WS-VAL.',opts:['999に変わる','100のまま変わらない','0になる','エラー'],ans:1,exp:'BY CONTENTはデータのコピーを渡します。サブプログラムがコピーを変更しても呼び出し元のWS-NUMには反映されません。WS-NUMは <strong>100のまま</strong>です。'},
+  {diff:'hard',cat:'ネスト配列',q:'次のコードを実行後、WS-COL(2,3) の値はいくつか。',code:'01 WS-TBL.\n   05 WS-ROW OCCURS 3 TIMES.\n      10 WS-COL OCCURS 3 TIMES PIC 9.\n\nMOVE 0 TO WS-TBL\nMOVE 7 TO WS-COL(2,3)',opts:['0','2','3','7'],ans:3,exp:'まずMOVE 0 TO WS-TBLで全要素を0に初期化。その後WS-COL(2,3)に7を格納。WS-COL(行,列)なので2行3列目が <strong>7</strong>、他の要素はすべて0です。'},
+  {diff:'hard',cat:'INSPECT複合',q:'次のコードを実行後、WS-STR と WS-CNT の値はどれか。',code:'01 WS-STR PIC X(8) VALUE "AAABBBCC".\n01 WS-CNT PIC 9 VALUE 0.\n\nINSPECT WS-STR\n    TALLYING WS-CNT FOR LEADING "A"\n    REPLACING LEADING "A" BY "X"',opts:['WS-STR="XXXBBBCC" WS-CNT=3','WS-STR="AAABBBCC" WS-CNT=3','WS-STR="XXXBBBCC" WS-CNT=0','WS-STR="XAABBBCC" WS-CNT=1'],ans:0,exp:'TALLYING FOR LEADINGは先頭の連続する"A"を数えます（3個）。REPLACING LEADINGは先頭の連続する"A"を"X"に置換。結果: WS-STR=<strong>"XXXBBBCC"</strong>、WS-CNT=<strong>3</strong>。'},
+  {diff:'hard',cat:'ファイル操作（索引編成）',q:'索引編成ファイルに対して READ NEXT 文を使うときの前提条件はどれか。',code:'',opts:['OPEN INPUTで開いていること','START文でカレントレコードポインタを設定していること','ファイルが空でないこと','LOCK句を設定していること'],ans:1,exp:'READ NEXTは <strong>START文でカレントレコードポインタを設定した後</strong>に使います。順次アクセスで次のレコードを読み取ります。'},
+  {diff:'hard',cat:'PERFORM複合',q:'次のコードを実行後、WS-RESULT の値はいくつか。',code:'01 WS-RESULT PIC 9(5) VALUE 0.\n01 WS-I PIC 9(2).\n01 WS-J PIC 9(2).\n\nPERFORM VARYING WS-I FROM 1 BY 1\n        UNTIL WS-I > 4\n    PERFORM VARYING WS-J FROM 1 BY 1\n            UNTIL WS-J > WS-I\n        ADD 1 TO WS-RESULT\n    END-PERFORM\nEND-PERFORM',opts:['4','6','10','16'],ans:2,exp:'外側I=1:内側1回、I=2:2回、I=3:3回、I=4:4回。合計1+2+3+4 = <strong>10回</strong>。三角数の公式 n(n+1)/2 = 4×5/2 = 10。'},
+  {diff:'hard',cat:'66レベル',q:'66レベル（RENAMES）の用途として正しいものはどれか。',code:'',opts:['変数を削除する','データ構造の連続した項目をまとめて別名をつける','配列を再定義する','条件名を定義する'],ans:1,exp:'66レベルのRENAMESは、同じレコード内の <strong>連続した項目群をまとめて別名</strong>でアクセスするために使います。REDEFINESとは異なり任意の範囲の連続項目に別名をつけます。'},
+  {diff:'hard',cat:'数値精度',q:'COBOLのCOMP-3とJavaのdoubleで同じ計算をしたとき結果が異なる可能性があるのはなぜか。',code:'',opts:['COBOLの方が処理が遅いため','COMP-3は10進数、doubleは2進浮動小数点であるため','COBOLは演算順序が異なるため','Javaは精度が低いため'],ans:1,exp:'COMP-3は <strong>10進数</strong>をパックして格納するため0.1や0.01などの小数を正確に表現できます。一方Javaのdoubleは <strong>2進浮動小数点</strong>で近似値になります。金融システム移行時の最重要論点です。'},
+  {diff:'hard',cat:'GOBACK',q:'GOBACK 文と EXIT PROGRAM 文の違いとして正しいものはどれか。',code:'',opts:['GOBACKは主プログラムでも使える、EXIT PROGRAMはサブプログラム専用','EXIT PROGRAMは主プログラムでも使える','GOBACKはエラー時のみ使う','両者に違いはない'],ans:0,exp:'GOBACKは主プログラムではSTOP RUNと同様に動作し、サブプログラムでは呼び出し元に制御を返します。つまり <strong>GOBACKは主・サブ両方で使える</strong>汎用の終了文です。'},
+  {diff:'hard',cat:'SPECIAL-NAMES',q:'SPECIAL-NAMES SECTION で DECIMAL-POINT IS COMMA を指定するとどうなるか。',code:'',opts:['小数点がカンマになり桁区切りがピリオドになる','カンマが使用禁止になる','ピリオドが文末記号でなくなる','エラーになる'],ans:0,exp:'DECIMAL-POINT IS COMMMAを指定すると、数値リテラルの小数点文字が"."から <strong>","（カンマ）</strong>になり桁区切りに"."が使われます。欧州の数値表記（例: 1.234,56）に対応したシステムで使います。'},
+  {diff:'hard',cat:'ファイルステータス',q:'ファイルステータスコード "23" が示す状態はどれか。',code:'',opts:['正常終了','レコードが見つからない（キー不一致）','ファイル終端','ファイルが存在しない'],ans:1,exp:'ファイルステータス "23" は <strong>READ（無作為アクセス）でキーに一致するレコードが見つからない</strong>ことを示します。"00"=正常、"10"=ファイル終端、"35"=ファイル不存在（OPEN時）。'},
+  {diff:'hard',cat:'COMPUTATIONAL',q:'COMP-1 と COMP-2 の違いとして正しいものはどれか。',code:'',opts:['COMP-1は整数、COMP-2は小数','COMP-1は単精度浮動小数点（4バイト）、COMP-2は倍精度（8バイト）','COMP-1はIBM独自、COMP-2はANSI標準','COMP-1は2バイト、COMP-2は4バイトの2進整数'],ans:1,exp:'COMP-1は <strong>単精度浮動小数点（IEEE 754、4バイト）</strong>、COMP-2は <strong>倍精度浮動小数点（IEEE 754、8バイト）</strong>です。金融計算では誤差が生じるためCOMP-3が一般的です。'},
+  {diff:'hard',cat:'再帰CALL',q:'COBOLで再帰呼び出しを可能にするために必要な指定はどれか。',code:'',opts:['RECURSIVE句の指定','INITIAL句の指定','EXTERNAL句の指定','COMMON句の指定'],ans:0,exp:'COBOL 2002以降では、プログラム定義に <strong>RECURSIVE</strong> 属性を指定することで自己再帰呼び出しが可能になります。RECURSIVE なしのプログラムを再帰呼び出しすると動作は未定義です。'},
+  {diff:'hard',cat:'EBCDIC',q:'日本の汎用機COBOL（IBM、富士通、日立）でDBCS（全角）文字を扱うためのPIC句はどれか。',code:'',opts:['PIC X','PIC N','PIC G（またはN）','PIC U'],ans:2,exp:'日本の汎用機COBOLでは全角（DBCS）文字を扱うために <strong>PIC G または PIC N</strong> を使います。PIC Gは各ベンダー独自の拡張で、PIC NはCOBOL 2002で標準化されました。EBCDIC環境での文字コードの扱いがモダナイゼーションの難所です。'},
+  {diff:'hard',cat:'COPY句',q:'COPY 句に REPLACING オプションをつける主な目的はどれか。',code:'',opts:['コピーブックをコメント化する','コピーブック内の名前を変換して取り込む','コピーブックを暗号化する','コピーブックの一部のみ取り込む'],ans:1,exp:'COPY～REPLACINGは、コピーブックを取り込む際にソース内の特定のテキストを別のテキストに <strong>置換</strong>しながら展開します。同じコピーブックを異なる変数名で複数取り込む際などに使います。'},
+  {diff:'hard',cat:'INITIAL属性',q:'PROGRAM-ID に INITIAL を指定するとどのような効果があるか。',code:'',opts:['プログラムが最初の1回しか実行されない','呼び出されるたびにWORKING-STORAGEが初期化される','初期値のない変数がゼロになる','デバッグモードで動作する'],ans:1,exp:'INITIAL属性を付けると <strong>CALLされるたびにWORKING-STORAGE SECTIONの変数が初期値（VALUE句の値）に戻ります</strong>。通常のサブプログラムは最初のCALL時のみ初期化されます。'},
+  {diff:'hard',cat:'GLOBAL属性',q:'GLOBAL 属性を持つデータ項目の特徴として正しいものはどれか。',code:'',opts:['プログラムが終了しても値を保持する','ネストされた内部プログラムからアクセスできる','外部ファイルに書き出される','すべてのプログラムで共有される'],ans:1,exp:'GLOBAL属性を付けたデータ項目は <strong>そのプログラムにネストされた内部プログラムからも参照・変更</strong>できます。ネストプログラム間のデータ共有手段の一つです。'},
+  {diff:'hard',cat:'XML/JSON',q:'COBOL 2014以降に追加されたXML・JSON処理の組み込み文はどれか。',code:'',opts:['XML PARSE / JSON PARSE','TRANSFORM XML / TRANSFORM JSON','READ XML / READ JSON','CONVERT XML / CONVERT JSON'],ans:0,exp:'COBOL 2014では <strong>XML PARSE・XML GENERATE・JSON PARSE・JSON GENERATE</strong> が組み込み文として追加されました。外部ライブラリなしでXMLやJSONを処理できます。'},
+  {diff:'hard',cat:'Y2K',q:'Y2K問題の根本原因として最も正しいものはどれか。',code:'',opts:['COBOLのバグ','西暦年を下2桁で管理していたため2000年を誤認する','コンピュータの時計が1999年末で停止する','COBOLが2000年以降の日付を計算できない'],ans:1,exp:'Y2K問題は言語のバグではなく <strong>ディスク・通信コストの節約のため西暦を下2桁（"99"→1999年）で管理していた設計</strong>が原因です。過去の合理的な設計判断が問題になった典型例です。'},
+  {diff:'hard',cat:'CORRESPONDING',q:'MOVE CORRESPONDING A TO B の動作として正しいものはどれか。',code:'',opts:['Aのすべての項目をBにMOVEする','AとBで同名の下位項目同士をMOVEする','A全体をB全体にMOVEする','Bの内容をAにコピーする'],ans:1,exp:'MOVE CORRESPONDING（CORR）は <strong>同名を持つ下位項目同士</strong>を対応づけてMOVEします。構造が異なるレコード間の同名フィールドをまとめて転記でき、コードを大幅に短縮できます。'},
+  {diff:'hard',cat:'数値編集（符号）',q:'PIC -ZZZ9 で格納先に -42 を格納したとき表示される値はどれか。',code:'',opts:['- 042','-  42','  -42','   -42'],ans:1,exp:'先頭の"-"は符号位置（負なら"-"、正なら空白）。Zはゼロ抑制（ゼロを空白に）。-42 → 整数部は"042"→Zで抑制→"  42"→先頭符号"-" → <strong>"-  42"</strong>（ハイフン+スペース2個+42）。'},
+  {diff:'hard',cat:'オブジェクト指向COBOL',q:'COBOL 2002で導入されたオブジェクト指向機能で、クラスのメソッドを定義するために使う見出しはどれか。',code:'',opts:['METHOD DIVISION','METHOD-ID','FUNCTION-ID','ENTRY'],ans:1,exp:'COBOL 2002のオブジェクト指向では <strong>METHOD-ID</strong> 句でメソッドを定義します。CLASS-IDでクラス、OBJECT SECTIONでインスタンスデータを定義します。'},
+];
+
+let cur=0,answers=new Array(TOTAL).fill(null),score=0;
+
+function getDiffLabel(d){return{easy:'易 EASY',mid:'中 MEDIUM',hard:'難 HARD'}[d];}
+function getDiffClass(d){return{easy:'d-easy',mid:'d-mid',hard:'d-hard'}[d];}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderProgress(idx){
+  const pct=Math.round(idx/TOTAL*100);
+  const answered=answers.filter(a=>a!==null).length;
+  const wrong=answered-score;
+  const rate=answered>0?Math.round(score/answered*100):0;
+  const dots=Array.from({length:TOTAL},(_,i)=>{
+    let c='dot';
+    if(i<idx)c+=answers[i]===QS[i].ans?' correct':' wrong';
+    else if(i===idx)c+=' current';
+    return '<div class="'+c+'"></div>';
+  }).join('');
+  return '<div class="progress-wrap"><div class="progress-meta"><span>Q'+(idx+1)+' / '+TOTAL+'</span><span>'+pct+'% 完了</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="rank-dots">'+dots+'</div></div><div class="score-strip"><div class="score-cell"><div class="val val-c">'+score+'</div><div class="lbl">正解</div></div><div class="score-cell"><div class="val val-w">'+wrong+'</div><div class="lbl">不正解</div></div><div class="score-cell"><div class="val val-p">'+rate+'%</div><div class="lbl">正答率</div></div></div>';
+}
+
+function renderQ(idx){
+  const q=QS[idx],done=answers[idx]!==null;
+  const lb=['ア','イ','ウ','エ'];
+  const opts=q.opts.map((o,i)=>{
+    let c='opt-btn';
+    if(done){if(i===q.ans)c+=' correct';else if(i===answers[idx])c+=' wrong';}
+    return '<button class="'+c+'" onclick="pick('+idx+','+i+')" '+(done?'disabled':'')+'><span class="opt-lbl">'+lb[i]+'</span><span>'+o+'</span></button>';
+  }).join('');
+  const isLast=idx===TOTAL-1;
+  document.getElementById('app').innerHTML=renderProgress(idx)
+    +'<div class="q-card fade-in">'
+    +'<div class="q-num">QUESTION '+String(idx+1).padStart(3,'0')+' / '+TOTAL+'</div>'
+    +'<span class="diff-badge '+getDiffClass(q.diff)+'">'+getDiffLabel(q.diff)+'</span>'
+    +'<div class="q-cat">'+q.cat+'</div>'
+    +'<div class="q-text">'+q.q+'</div>'
+    +(q.code?'<div class="code-block">'+esc(q.code)+'</div>':'')
+    +'<div class="options">'+opts+'</div>'
+    +'<div class="explanation'+(done?' show':'')+'">'+( done?'<strong>解説:</strong> '+q.exp:'')+'</div>'
+    +'</div>'
+    +'<div class="nav">'
+    +'<button class="nav-btn" onclick="go(-1)" '+(idx===0?'disabled':'')+'>← 前へ</button>'
+    +'<button class="nav-btn primary" onclick="go(1)" '+(!done?'disabled':'')+'>'+(isLast?'結果を見る →':'次へ →')+'</button>'
+    +'</div>';
+}
+
+function pick(idx,i){
+  if(answers[idx]!==null)return;
+  answers[idx]=i;
+  if(i===QS[idx].ans)score++;
+  renderQ(idx);
+}
+
+function go(d){
+  if(d===1&&cur===TOTAL-1){showResult();return;}
+  cur=Math.max(0,Math.min(TOTAL-1,cur+d));
+  renderQ(cur);
+}
+
+function showResult(){
+  const pct=Math.round(score/TOTAL*100);
+  const isKing=score===TOTAL;
+  const title=isKing?'COBOL王':pct>=90?'COBOL師範':pct>=70?'COBOL使い':pct>=50?'COBOL見習い':'COBOLの卵';
+  const msg=isKing?'完璧だ。あなたこそ真のCOBOL王！':pct>=90?'素晴らしい実力。COBOL王まであと一歩！':pct>=70?'中級レベル。さらなる研鑽を積もう。':pct>=50?'基礎は身についてきた。継続あるのみ！':'挑戦を続けよう。COBOLの道は長い。';
+  document.getElementById('app').innerHTML='<div class="result-screen fade-in">'
+    +'<div style="font-size:56px">'+(isKing?'&#128081;':'&#127894;')+'</div>'
+    +'<div class="result-title">'+title+'</div>'
+    +'<div class="result-sub">'+score+' / '+TOTAL+' 正解　正答率 '+pct+'%</div>'
+    +'<div class="score-strip"><div class="score-cell"><div class="val val-c">'+score+'</div><div class="lbl">正解</div></div><div class="score-cell"><div class="val val-w">'+(TOTAL-score)+'</div><div class="lbl">不正解</div></div><div class="score-cell"><div class="val val-p">'+pct+'%</div><div class="lbl">正答率</div></div></div>'
+    +'<p style="font-size:14px;color:var(--text2);margin-bottom:1.5rem">'+msg+'</p>'
+    +'<div id="title-card-wrap"><canvas id="titleCanvas" width="500" height="300"></canvas>'
+    +'<button class="save-btn" onclick="saveCard()">称号カードを保存する（PNG）</button></div>'
+    +'<button class="retry-btn" onclick="location.reload()">もう一度チャレンジする</button>'
+    +'</div>';
+  drawCard(title,score,pct,isKing);
+}
+
+function drawCard(title,score,pct,isKing){
+  const cv=document.getElementById('titleCanvas'),c=cv.getContext('2d'),W=500,H=300;
+  c.fillStyle='#0a0a0f';c.fillRect(0,0,W,H);
+  const g=c.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'rgba(201,168,76,.18)');g.addColorStop(1,'rgba(201,168,76,.04)');
+  c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.strokeStyle='#c9a84c';c.lineWidth=1.5;c.strokeRect(12,12,W-24,H-24);
+  c.strokeStyle='rgba(201,168,76,.3)';c.lineWidth=.5;c.strokeRect(18,18,W-36,H-36);
+  c.fillStyle='#c9a84c';c.font='bold 12px monospace';c.textAlign='center';
+  c.fillText('COBOL 100\u554f\u30c1\u30e3\u30ec\u30f3\u30b8',W/2,46);
+  c.font='bold '+(isKing?'46':'36')+'px serif';
+  c.fillStyle='#f0d080';c.shadowColor='rgba(201,168,76,.6)';c.shadowBlur=24;
+  c.fillText((isKing?'\u{1F451} ':'')+title,W/2,148);c.shadowBlur=0;
+  c.font='14px monospace';c.fillStyle='#9a9480';
+  c.fillText(score+' / 100 \u6b63\u89e3\u3000\u6b63\u7b54\u7387 '+pct+'%',W/2,192);
+  const now=new Date(),ds=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
+  c.font='11px monospace';c.fillStyle='#5a5448';c.fillText(ds,W/2,260);
+  c.fillStyle='#c9a84c';c.font='10px monospace';c.fillText('COBOL KING CHALLENGE',W/2,278);
+}
+
+function saveCard(){
+  const a=document.createElement('a');
+  a.download='cobol_title_card.png';
+  a.href=document.getElementById('titleCanvas').toDataURL('image/png');
+  a.click();
+}
+
+(function renderStart(){
+  document.getElementById('app').innerHTML='<div class="start-screen fade-in">'
+    +'<p class="start-desc">COBOLプログラミングの実力を100問で証明せよ。<br>易・中・難の3段階、全カテゴリから出題。<br><strong style="color:var(--gold)">全問正解でCOBOL王の称号カードを獲得！</strong></p>'
+    +'<div class="start-grid">'
+    +'<div class="start-cell"><div class="num" style="color:var(--easy)">33</div><div class="label">易問</div></div>'
+    +'<div class="start-cell"><div class="num" style="color:var(--mid)">34</div><div class="label">中問</div></div>'
+    +'<div class="start-cell"><div class="num" style="color:var(--hard)">33</div><div class="label">難問</div></div>'
+    +'</div>'
+    +'<button class="start-btn" onclick="answers=new Array('+TOTAL+').fill(null);score=0;cur=0;renderQ(0)">\u30c1\u30e3\u30ec\u30f3\u30b8\u958b\u59cb \u2192</button>'
+    +'</div>';
+})();
+</script>
+</body>
+</html>
