@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COBOL王 100問チャレンジ</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="COBOL王">
+<meta name="theme-color" content="#c9a84c">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 :root {
@@ -300,6 +306,15 @@ function saveCard(){
     +'<button class="start-btn" onclick="answers=new Array('+TOTAL+').fill(null);score=0;cur=0;renderQ(0)">\u30c1\u30e3\u30ec\u30f3\u30b8\u958b\u59cb \u2192</button>'
     +'</div>';
 })();
+
+// PWA: Service Worker登録
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  });
+}
 </script>
 </body>
 </html>
